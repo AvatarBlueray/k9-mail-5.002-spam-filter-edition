@@ -9,8 +9,11 @@
          android:id="@+id/reply_all"
          android:title="@string/reply_all_action"/>
      <item
-         android:id="@+id/reply"
-         android:title="@string/reply_action"/>
+    android:id="@+id/reply"
+    android:title="@string/reply_action"/>
+    <item
+        android:id="@+id/configure_spam_filter_from_source"
+        android:title="@string/spam_filter_configure_spam_filter_from_source"/>
      <item
          android:id="@+id/send_again"
          android:title="@string/send_again_action"/>

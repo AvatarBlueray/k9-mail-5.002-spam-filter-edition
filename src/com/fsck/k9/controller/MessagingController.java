@@ -4621,6 +4621,34 @@ public class MessagingController implements Runnable {
             return false;
         }
 
+        String subj = message.getSubject();
+
+        Log.e(K9.LOG_TAG, "subj is  " + subj);
+
+
+        Address[] address = message.getFrom();
+
+        for (Address adr:address){
+            String from = adr.getAddress();
+
+            // Log.e(K9.LOG_TAG, "subj from  is  " + subj+ "  "+ from);
+
+            long result = checkForSpam(from,subj);
+
+            if (result == spam_filter_db_helper.ACTION_HIDE ){
+                // Log.e(K9.LOG_TAG, "action hide  " );
+                return  false;
+            }
+
+            if (result == spam_filter_db_helper.ACTION_HIDENDEL ){
+                // Log.e(K9.LOG_TAG, "action del  " );
+
+                deleteMessages(Collections.singletonList(localmessage), null);
+                return  false;
+            }
+
+        }
+
         // Do not notify if the user does not have notifications enabled or if the message has
         // been read.
         if (!account.isNotifyNewMail() || message.isSet(Flag.SEEN)) {
@@ -4682,35 +4710,6 @@ public class MessagingController implements Runnable {
         if (account.isAnIdentity(message.getFrom()) && !account.isNotifySelfNewMail()) {
             return false;
         }
-
-        String subj = message.getSubject();
-
-        Log.e(K9.LOG_TAG, "subj is  " + subj);
-
-
-        Address[] address = message.getFrom();
-
-        for (Address adr:address){
-            String from = adr.getAddress();
-
-           // Log.e(K9.LOG_TAG, "subj from  is  " + subj+ "  "+ from);
-
-            long result = checkForSpam(from,subj);
-
-            if (result == spam_filter_db_helper.ACTION_HIDE ){
-               // Log.e(K9.LOG_TAG, "action hide  " );
-                return  false;
-            }
-
-            if (result == spam_filter_db_helper.ACTION_HIDENDEL ){
-              // Log.e(K9.LOG_TAG, "action del  " );
-
-                  deleteMessages(Collections.singletonList(localmessage), null);
-                return  false;
-            }
-
-        }
-
 
         return true;
     }

@@ -27,8 +27,20 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.fsck.k9.Account;
 import com.fsck.k9.K9;
+import com.fsck.k9.Preferences;
 import com.fsck.k9.R;
+import com.fsck.k9.controller.MessageRetrievalListener;
+import com.fsck.k9.controller.MessagingController;
+import com.fsck.k9.mail.Address;
+import com.fsck.k9.mail.Message;
+import com.fsck.k9.mail.store.LocalStore;
+import com.fsck.k9.mail.store.LocalStore.LocalMessage;
+import com.fsck.k9.search.LocalSearch;
+
+import java.util.Collections;
+import java.util.List;
 
 public class NoteEdit extends Activity {
 
@@ -58,6 +70,7 @@ public class NoteEdit extends Activity {
 
         Button confirmButton = (Button) findViewById(R.id.confirm);
         Button donteButton = (Button) findViewById(R.id.donate);
+        Button applyfilterButton = (Button) findViewById(R.id.apply_filter);
 
 
         mRowId = (savedInstanceState == null) ? null :
@@ -66,7 +79,17 @@ public class NoteEdit extends Activity {
 			Bundle extras = getIntent().getExtras();
 			mRowId = extras != null ? extras.getLong(NotesDbAdapter.KEY_ROWID)
 									: null;
+
+
+            mTitleText.setText(extras != null ? extras.getString(NotesDbAdapter.KEY_FROM,""): "");
+            mFromText.setText(extras != null ? extras.getString(NotesDbAdapter.KEY_FROM,""): "");
+            mSubjText.setText(extras != null ? extras.getString(NotesDbAdapter.KEY_SUBJ,""): "");
 		}
+
+
+        if (mRowId == 0){
+            mRowId = null;
+        }
 
 		populateFields();
 
@@ -75,6 +98,14 @@ public class NoteEdit extends Activity {
             public void onClick(View view) {
                 setResult(RESULT_OK);
                 finish();
+            }
+
+        });
+
+        applyfilterButton.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View view) {
+                applyfilter();
             }
 
         });
@@ -91,6 +122,84 @@ public class NoteEdit extends Activity {
         });
     }
 
+    private void applyfilter(){
+
+        if (!mDelCb.isChecked())
+            return;
+
+        final String from_t = mFromText.getText().toString();
+        final String subj_t = mSubjText.getText().toString();
+
+         final MessagingController controller = MessagingController.getInstance(getApplication());
+
+
+
+        Account[] accounts = Preferences.getPreferences(getApplicationContext()).getAccounts();
+        for (final Account account : accounts) {
+            // Collecting statistics of the search result
+
+            MessageRetrievalListener retrievalListener = new MessageRetrievalListener() {
+
+
+                @Override
+                public void messageStarted(String uid, int number, int ofTotal) {
+
+                }
+
+                @Override
+                public void messageFinished(Message message, int number, int ofTotal) {
+                    String subj = message.getSubject();
+                    Address[] address = message.getFrom();
+                    String from = "";
+                    for (Address adr : address) {
+                        from = adr.getAddress();
+                    }
+                    boolean delete = false;
+
+                    if (!from_t.isEmpty() && from.matches(from_t)) {
+
+                        if (!subj_t.isEmpty()) {
+                            if (subj.matches(subj_t)) {
+                                delete = true;
+                            }
+                        } else {
+                            delete = true;
+                        }
+
+                    } else {
+                        if (!subj_t.isEmpty() && subj.matches(subj_t))
+                            delete = true;
+                    }
+
+
+                    if (delete) {
+                      //  Log.e(K9.LOG_TAG, "delete  " + message.getSubject());
+                        controller.deleteMessages(Collections.singletonList(message), null);
+                    }
+
+                }
+
+                @Override
+                public void messagesFinished(int total) {
+
+                }
+            };
+
+
+            // build and do the query in the localstore
+            try {
+                LocalStore localStore = account.getLocalStore();
+                LocalSearch tmpSearch = new LocalSearch();
+                localStore.searchForMessages(retrievalListener, tmpSearch);
+            } catch (Exception e) {
+                Log.e(K9.LOG_TAG, "some happins  " + e.toString());
+
+            }
+        }
+
+
+    }
+
     private void createHelper(){
         if (mDbHelper == null){
             mDbHelper = new NotesDbAdapter(this);
@@ -99,7 +208,7 @@ public class NoteEdit extends Activity {
     }
 
     private void populateFields() {
-        if (mRowId != null) {
+        if (mRowId != null ) {
             Cursor note = mDbHelper.fetchNote(mRowId);
             startManagingCursor(note);
             mTitleText.setText(note.getString(

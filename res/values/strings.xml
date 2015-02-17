@@ -1144,6 +1144,8 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="spam_filter_confirm">Confirm</string>
     <string name="spam_filter_edit_filter">Edit Filter</string>
     <string name="spam_filter_action">Configure Spam Filter</string>
+    <string name="spam_filter_apply_filter_to_existing_mail">Apply filter to existing mail</string>
+    <string name="spam_filter_configure_spam_filter_from_source">Configure Spam Filter From Mail</string>
     <string name="spam_filter_request">Request at Avatar.Blueray@gmail.com
     donation BTC copy wallet to clipboard</string>
 </resources>

@@ -69,16 +69,33 @@
         android:layout_weight="2" />
 </LinearLayout>
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_weight="3">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/spam_filter_apply_filter_to_existing_mail"
+            android:id="@+id/apply_filter"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical" />
+        </LinearLayout>
+
     <LinearLayout android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center|bottom">
 
+
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="request at Avatar.blueray@gmail.com"
+            android:text="request at Avatar.Blueray@gmail.com"
             android:id="@+id/textView"
             android:textSize="20dp"
             android:textAlignment="center" />

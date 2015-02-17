@@ -747,6 +747,11 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
         Prefs.actionPrefs(this);
     }
 
+    private void onSpamfilter() {
+        Intent i = new Intent(this, com.fsck.k9.spam_filter.Notepadv3.class);
+        startActivityForResult(i, 0);
+    }
+
     private void onEditAccount() {
         AccountSettings.actionSettings(this, mAccount);
     }
@@ -809,6 +814,10 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
                 mMessageListFragment.selectAll();
                 return true;
             }
+            case R.id.configure_spam_filter: {
+                onSpamfilter();
+                return true;
+            }
             case R.id.app_settings: {
                 onEditPrefs();
                 return true;
@@ -850,6 +859,11 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
                 mMessageViewFragment.onReply();
                 return true;
             }
+            /*case R.id.configure_spam_filter_from_source: {
+
+                Log.e(K9.LOG_TAG, "configure_spam_filter_from_source");
+                return true;
+            }*/
             case R.id.reply_all: {
                 mMessageViewFragment.onReplyAll();
                 return true;

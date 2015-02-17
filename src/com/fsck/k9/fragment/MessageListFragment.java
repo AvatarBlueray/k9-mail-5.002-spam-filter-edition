@@ -100,6 +100,8 @@ import com.fsck.k9.search.SearchSpecification;
 import com.fsck.k9.search.SearchSpecification.SearchCondition;
 import com.fsck.k9.search.SearchSpecification.Searchfield;
 import com.fsck.k9.search.SqlQueryBuilder;
+import com.fsck.k9.spam_filter.NoteEdit;
+import com.fsck.k9.spam_filter.NotesDbAdapter;
 import com.handmark.pulltorefresh.library.ILoadingLayout;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -1513,6 +1515,29 @@ public class MessageListFragment extends Fragment implements OnItemClickListener
                 onReply(message);
                 break;
             }
+            case R.id.configure_spam_filter_from_source: {
+                Message message = getMessageAtPosition(adapterPosition);
+                String subj = message.getSubject();
+                Address[] address = message.getFrom();
+                Address adr_t = null;
+                for (Address adr:address){
+                    adr_t = adr;
+                }
+
+                String from  = "";
+                if ( adr_t != null ) {
+                    from = adr_t.getAddress();
+                }
+
+
+                Intent i = new Intent(mContext, NoteEdit.class);
+                i.putExtra(NotesDbAdapter.KEY_SUBJ, subj);
+                i.putExtra(NotesDbAdapter.KEY_FROM, from);
+                startActivityForResult(i, 1);
+
+                break;
+            }
+
             case R.id.reply_all: {
                 Message message = getMessageAtPosition(adapterPosition);
                 onReplyAll(message);
