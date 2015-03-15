@@ -87,8 +87,10 @@ public class NoteEdit extends Activity {
 		}
 
 
-        if (mRowId == 0){
-            mRowId = null;
+        if (mRowId != null){
+            if (mRowId == 0){
+                mRowId = null;
+            }
         }
 
 		populateFields();
