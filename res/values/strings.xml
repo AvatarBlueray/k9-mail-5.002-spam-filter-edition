@@ -344,6 +344,8 @@ Please submit bug reports, contribute new features and ask questions at
 
     <string name="quiet_time">Quiet Time</string>
     <string name="quiet_time_description">Disable ringing, buzzing and flashing at night</string>
+    <string name="notify_spam_anywere">Уведомдения о спаме</string>
+    <string name="notify_spam_anywere_description">Показывать уведомления о спаме всегда</string>
     <string name="quiet_time_starts">Quiet Time starts</string>
     <string name="quiet_time_ends">Quiet Time ends</string>
 
@@ -452,6 +454,9 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="account_setup_options_mail_check_frequency_label">Folder poll frequency</string>
     <string name="account_setup_options_mail_check_frequency_never">Never</string>
     <string name="account_setup_options_mail_check_frequency_1min">Every minute</string>
+    <string name="account_setup_options_mail_check_frequency_2min">Every 2 minutes</string>
+    <string name="account_setup_options_mail_check_frequency_3min">Every 3 minutes</string>
+    <string name="account_setup_options_mail_check_frequency_4min">Every 4 minutes</string>
     <string name="account_setup_options_mail_check_frequency_5min">Every 5 minutes</string>
     <string name="account_setup_options_mail_check_frequency_10min">Every 10 minutes</string>
     <string name="account_setup_options_mail_check_frequency_15min">Every 15 minutes</string>
@@ -1130,4 +1135,24 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="client_certificate_retrieval_failure">"Failed to retrieve client certificate for alias \"<xliff:g id="alias">%s</xliff:g>\""</string>
     <string name="client_certificate_advanced_options">Advanced options</string>
     <string name="client_certificate_expired">"Client certificate \"<xliff:g id="certificate_alias">%1$s</xliff:g>\" has expired or is not yet valid (<xliff:g id="exception_message">%2$s</xliff:g>)"</string>
+
+    <!-- Spam Filter-->
+    <string name="spam_filter_app_name">Spam Filter</string>
+    <string name="spam_filter_no_filter">No Filters Yet</string>
+    <string name="spam_filter_menu_insert">Add Filter</string>
+    <string name="spam_filter_menu_delete">Delete Filter</string>
+    <string name="spam_filter_title">Title</string>
+    <string name="spam_filter_from">From</string>
+    <string name="spam_filter_subj">Subj</string>
+    <string name="spam_filter_hide">Hide</string>
+    <string name="spam_filter_del">Del</string>
+    <string name="spam_filter_confirm">Confirm</string>
+    <string name="spam_filter_edit_filter">Edit Filter</string>
+    <string name="spam_filter_action">Configure Spam Filter</string>
+    <string name="spam_filter_apply_filter_to_existing_mail">Apply filter to existing mail</string>
+    <string name="spam_filter_cancel">Cancel</string>
+    <string name="spam_filter_configure_spam_filter_from_source">Configure Spam Filter From Mail</string>
+    <string name="spam_filter_to_spam_from_this_domain">To spam from this domain</string>
+    <string name="spam_filter_request">Request at Avatar.Blueray@gmail.com
+    donation BTC copy wallet to clipboard</string>
 </resources>

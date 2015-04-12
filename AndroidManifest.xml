@@ -283,8 +283,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.AccessibleEmailContentActivity"
-            >
+        android:name=".activity.AccessibleEmailContentActivity"
+        >
+    </activity>
+        <activity
+            android:name=".spam_filter.Notepadv3" >
+        </activity>
+        <activity
+            android:name=".spam_filter.NoteEdit" >
         </activity>
         <activity android:name=".activity.EmailAddressList"
             android:configChanges="locale"

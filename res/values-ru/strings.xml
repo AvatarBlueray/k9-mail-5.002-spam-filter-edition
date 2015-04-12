@@ -370,6 +370,9 @@ K-9 Mail — почтовый клиент для Android.
   <string name="account_setup_options_mail_check_frequency_label">Интервал проверки</string>
   <string name="account_setup_options_mail_check_frequency_never">Вручную</string>
   <string name="account_setup_options_mail_check_frequency_1min">1 минута</string>
+    <string name="account_setup_options_mail_check_frequency_2min">2 минуты</string>
+    <string name="account_setup_options_mail_check_frequency_3min">3 минуты</string>
+    <string name="account_setup_options_mail_check_frequency_4min">4 минуты</string>
   <string name="account_setup_options_mail_check_frequency_5min">5 минут</string>
   <string name="account_setup_options_mail_check_frequency_10min">10 минут</string>
   <string name="account_setup_options_mail_check_frequency_15min">15 минут</string>

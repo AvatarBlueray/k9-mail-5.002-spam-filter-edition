@@ -226,6 +226,11 @@
         android:id="@+id/show_folder_list"
         android:showAsAction="never"
         android:title="@string/folders_title" />
+    <item
+        android:id="@+id/configure_spam_filter"
+        android:showAsAction="never"
+        android:title="@string/spam_filter_action" />
+
     <!-- always -->
     <item
         android:id="@+id/settings"

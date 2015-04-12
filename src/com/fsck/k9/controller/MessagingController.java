@@ -95,6 +95,8 @@ import com.fsck.k9.search.SearchSpecification;
 import com.fsck.k9.search.SqlQueryBuilder;
 import com.fsck.k9.service.NotificationActionService;
 
+import com.fsck.k9.spam_filter.spam_filter_db_helper;
+
 
 /**
  * Starts a long running (application) Thread that will run through commands
@@ -1664,7 +1666,7 @@ public class MessagingController implements Runnable {
                     }
                     // Send a notification of this message
 
-                    if (shouldNotifyForMessage(account, localFolder, message)) {
+                    if (shouldNotifyForMessage(account, localFolder, message, localMessage)) {
                         // Notify with the localMessage so that we don't have to recalculate the content preview.
                         notifyAccount(mApplication, account, localMessage, unreadBeforeStart);
                     }
@@ -1802,7 +1804,7 @@ public class MessagingController implements Runnable {
             }
 
             // Send a notification of this message
-            if (shouldNotifyForMessage(account, localFolder, message)) {
+            if (shouldNotifyForMessage(account, localFolder, message, localMessage)) {
                 // Notify with the localMessage so that we don't have to recalculate the content preview.
                 notifyAccount(mApplication, account, localMessage, unreadBeforeStart);
             }
@@ -1850,7 +1852,7 @@ public class MessagingController implements Runnable {
                         for (MessagingListener l : getListeners()) {
                             l.synchronizeMailboxAddOrUpdateMessage(account, folder, localMessage);
                         }
-                        if (shouldNotifyForMessage(account, localFolder, localMessage)) {
+                        if (shouldNotifyForMessage(account, localFolder, localMessage, localMessage)) {
                             shouldBeNotifiedOf = true;
                         }
                     }
@@ -4602,12 +4604,49 @@ public class MessagingController implements Runnable {
         });
     }
 
+    private long checkForSpam(String from, String subj){
+        spam_filter_db_helper db;
+        db = new spam_filter_db_helper( mApplication.getApplicationContext());
+        long ret = db.checkForSpamGetAction(from,subj);
+        db.closeDB();
 
-    private boolean shouldNotifyForMessage(Account account, LocalFolder localFolder, Message message) {
+        return  ret;
+    }
+
+
+    private boolean shouldNotifyForMessage(Account account, LocalFolder localFolder, Message message, Message localmessage) {
         // If we don't even have an account name, don't show the notification.
         // (This happens during initial account setup)
         if (account.getName() == null) {
             return false;
+        }
+
+        String subj = message.getSubject();
+
+       // Log.e(K9.LOG_TAG, "subj is  " + subj);
+
+
+        Address[] address = message.getFrom();
+
+        for (Address adr:address){
+            String from = adr.getAddress();
+
+            // Log.e(K9.LOG_TAG, "subj from  is  " + subj+ "  "+ from);
+
+            long result = checkForSpam(from,subj);
+
+            if (result == spam_filter_db_helper.ACTION_HIDE ){
+                // Log.e(K9.LOG_TAG, "action hide  " );
+                return  false;
+            }
+
+            if (result == spam_filter_db_helper.ACTION_HIDENDEL ){
+                // Log.e(K9.LOG_TAG, "action del  " );
+
+                deleteMessages(Collections.singletonList(localmessage), null);
+                return  false;
+            }
+
         }
 
         // Do not notify if the user does not have notifications enabled or if the message has
@@ -4646,7 +4685,7 @@ public class MessagingController implements Runnable {
             if (!account.getInboxFolderName().equals(folderName) &&
                     (account.getTrashFolderName().equals(folderName)
                      || account.getDraftsFolderName().equals(folderName)
-                     || account.getSpamFolderName().equals(folderName)
+                     || ( K9.isNotSpamEnabled() && account.getSpamFolderName().equals(folderName) )
                      || account.getSentFolderName().equals(folderName))) {
                 return false;
             }

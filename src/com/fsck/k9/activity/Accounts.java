@@ -95,6 +95,8 @@ import com.fsck.k9.search.SearchSpecification.Attribute;
 import com.fsck.k9.search.SearchSpecification.Searchfield;
 import com.fsck.k9.view.ColorChip;
 
+import com.fsck.k9.spam_filter.*;
+
 import de.cketti.library.changelog.ChangeLog;
 
 
@@ -1262,6 +1264,9 @@ public class Accounts extends K9ListActivity implements OnItemClickListener {
         case R.id.about:
             onAbout();
             break;
+        case R.id.spamfilter:
+            onSpamfilter();
+            break;
         case R.id.search:
             onSearchRequested();
             break;
@@ -1287,6 +1292,11 @@ public class Accounts extends K9ListActivity implements OnItemClickListener {
         new String[] {"ckChangeLog", "https://github.com/cketti/ckChangeLog"},
         new String[] {"HoloColorPicker", "https://github.com/LarsWerkman/HoloColorPicker"}
     };
+
+    private void onSpamfilter() {
+        Intent i = new Intent(this, com.fsck.k9.spam_filter.Notepadv3.class);
+        startActivityForResult(i, 0);
+    }
 
     private void onAbout() {
         String appName = getString(R.string.app_name);

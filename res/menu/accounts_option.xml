@@ -28,6 +28,10 @@
         android:icon="?attr/iconActionAbout"
         android:title="@string/about_action"/>
     <item
+        android:id="@+id/spamfilter"
+        android:icon="?attr/iconActionAbout"
+        android:title="@string/spam_filter_action"/>
+    <item
         android:id="@+id/import_export"
         android:icon="?attr/iconActionImportExport"
         android:title="@string/import_export_action">

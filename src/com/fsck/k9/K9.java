@@ -255,6 +255,7 @@ public class K9 extends Application {
     private static boolean mHideSpecialAccounts = false;
     private static boolean mAutofitWidth;
     private static boolean mQuietTimeEnabled = false;
+    private static boolean mNotifySpamEnywere = false;
     private static String mQuietTimeStarts = null;
     private static String mQuietTimeEnds = null;
     private static String mAttachmentDefaultPath = "";
@@ -510,6 +511,7 @@ public class K9 extends Application {
         editor.putBoolean("useVolumeKeysForListNavigation", mUseVolumeKeysForListNavigation);
         editor.putBoolean("autofitWidth", mAutofitWidth);
         editor.putBoolean("quietTimeEnabled", mQuietTimeEnabled);
+        editor.putBoolean("notifySpamEnywere", mNotifySpamEnywere);
         editor.putString("quietTimeStarts", mQuietTimeStarts);
         editor.putString("quietTimeEnds", mQuietTimeEnds);
 
@@ -726,6 +728,7 @@ public class K9 extends Application {
         mAutofitWidth = sprefs.getBoolean("autofitWidth", true);
 
         mQuietTimeEnabled = sprefs.getBoolean("quietTimeEnabled", false);
+        mNotifySpamEnywere = sprefs.getBoolean("notifySpamEnywere", false);
         mQuietTimeStarts = sprefs.getString("quietTimeStarts", "21:00");
         mQuietTimeEnds = sprefs.getString("quietTimeEnds", "7:00");
 
@@ -978,9 +981,16 @@ public class K9 extends Application {
     public static boolean getQuietTimeEnabled() {
         return mQuietTimeEnabled;
     }
+    public static boolean getNotifySpamAnywere() {
+        return mNotifySpamEnywere;
+    }
 
     public static void setQuietTimeEnabled(boolean quietTimeEnabled) {
         mQuietTimeEnabled = quietTimeEnabled;
+    }
+
+    public static void setNotifySpamAnywere(boolean notifySpamEnywere) {
+        mNotifySpamEnywere = notifySpamEnywere;
     }
 
     public static String getQuietTimeStarts() {
@@ -1000,6 +1010,9 @@ public class K9 extends Application {
     }
 
 
+	public static boolean isNotSpamEnabled(){
+			return !mNotifySpamEnywere;
+	}
     public static boolean isQuietTime() {
         if (!mQuietTimeEnabled) {
             return false;
