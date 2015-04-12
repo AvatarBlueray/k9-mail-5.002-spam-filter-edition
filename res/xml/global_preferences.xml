@@ -327,6 +327,12 @@
             android:dialogTitle="@string/global_settings_notification_quick_delete_title"
             android:summary="@string/global_settings_notification_quick_delete_description"
             />
+        <CheckBoxPreference
+            android:key="notify_spam_anywere"
+            android:persistent="false"
+            android:title="@string/notify_spam_anywere"
+            android:summary="@string/notify_spam_anywere_description"
+            />
 
     </PreferenceScreen>
 

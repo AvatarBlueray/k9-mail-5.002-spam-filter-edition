@@ -157,6 +157,9 @@ public class GlobalSettings {
         s.put("quietTimeEnabled", Settings.versions(
                 new V(1, new BooleanSetting(false))
             ));
+		s.put("notifySpamEnywere", Settings.versions(
+                new V(1, new BooleanSetting(false))
+            ));	
         s.put("quietTimeEnds", Settings.versions(
                 new V(1, new TimeSetting("7:00"))
             ));

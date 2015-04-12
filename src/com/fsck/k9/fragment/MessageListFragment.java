@@ -107,6 +107,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 
+
 public class MessageListFragment extends Fragment implements OnItemClickListener,
         ConfirmationDialogFragmentListener, LoaderCallbacks<Cursor> {
 
@@ -1533,6 +1534,30 @@ public class MessageListFragment extends Fragment implements OnItemClickListener
                 Intent i = new Intent(mContext, NoteEdit.class);
                 i.putExtra(NotesDbAdapter.KEY_SUBJ, subj);
                 i.putExtra(NotesDbAdapter.KEY_FROM, from);
+                startActivityForResult(i, 1);
+
+                break;
+            }
+
+            case R.id.to_spam_from_this_domain: {
+                Message message = getMessageAtPosition(adapterPosition);
+
+                Address[] address = message.getFrom();
+                Address adr_t = null;
+                for (Address adr:address){
+                    adr_t = adr;
+                }
+
+                String from  = "";
+                if ( adr_t != null ) {
+                    from = ".*@"+adr_t.getAddress().split("@")[1];
+                }
+
+
+                Intent i = new Intent(mContext, NoteEdit.class);
+                i.putExtra(NotesDbAdapter.KEY_SUBJ, "");
+                i.putExtra(NotesDbAdapter.KEY_FROM, from);
+                i.putExtra(NotesDbAdapter.KEY_DEL, true);
                 startActivityForResult(i, 1);
 
                 break;

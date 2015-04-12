@@ -344,6 +344,8 @@ Please submit bug reports, contribute new features and ask questions at
 
     <string name="quiet_time">Quiet Time</string>
     <string name="quiet_time_description">Disable ringing, buzzing and flashing at night</string>
+    <string name="notify_spam_anywere">Уведомдения о спаме</string>
+    <string name="notify_spam_anywere_description">Показывать уведомления о спаме всегда</string>
     <string name="quiet_time_starts">Quiet Time starts</string>
     <string name="quiet_time_ends">Quiet Time ends</string>
 
@@ -452,6 +454,9 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="account_setup_options_mail_check_frequency_label">Folder poll frequency</string>
     <string name="account_setup_options_mail_check_frequency_never">Never</string>
     <string name="account_setup_options_mail_check_frequency_1min">Every minute</string>
+    <string name="account_setup_options_mail_check_frequency_2min">Every 2 minutes</string>
+    <string name="account_setup_options_mail_check_frequency_3min">Every 3 minutes</string>
+    <string name="account_setup_options_mail_check_frequency_4min">Every 4 minutes</string>
     <string name="account_setup_options_mail_check_frequency_5min">Every 5 minutes</string>
     <string name="account_setup_options_mail_check_frequency_10min">Every 10 minutes</string>
     <string name="account_setup_options_mail_check_frequency_15min">Every 15 minutes</string>
@@ -1145,7 +1150,9 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="spam_filter_edit_filter">Edit Filter</string>
     <string name="spam_filter_action">Configure Spam Filter</string>
     <string name="spam_filter_apply_filter_to_existing_mail">Apply filter to existing mail</string>
+    <string name="spam_filter_cancel">Cancel</string>
     <string name="spam_filter_configure_spam_filter_from_source">Configure Spam Filter From Mail</string>
+    <string name="spam_filter_to_spam_from_this_domain">To spam from this domain</string>
     <string name="spam_filter_request">Request at Avatar.Blueray@gmail.com
     donation BTC copy wallet to clipboard</string>
 </resources>

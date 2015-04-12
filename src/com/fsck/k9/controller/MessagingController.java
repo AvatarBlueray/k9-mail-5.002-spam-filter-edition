@@ -4623,7 +4623,7 @@ public class MessagingController implements Runnable {
 
         String subj = message.getSubject();
 
-        Log.e(K9.LOG_TAG, "subj is  " + subj);
+       // Log.e(K9.LOG_TAG, "subj is  " + subj);
 
 
         Address[] address = message.getFrom();
@@ -4685,7 +4685,7 @@ public class MessagingController implements Runnable {
             if (!account.getInboxFolderName().equals(folderName) &&
                     (account.getTrashFolderName().equals(folderName)
                      || account.getDraftsFolderName().equals(folderName)
-                     || account.getSpamFolderName().equals(folderName)
+                     || ( K9.isNotSpamEnabled() && account.getSpamFolderName().equals(folderName) )
                      || account.getSentFolderName().equals(folderName))) {
                 return false;
             }

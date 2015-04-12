@@ -71,6 +71,7 @@ public class NoteEdit extends Activity {
         Button confirmButton = (Button) findViewById(R.id.confirm);
         Button donteButton = (Button) findViewById(R.id.donate);
         Button applyfilterButton = (Button) findViewById(R.id.apply_filter);
+        Button cancelButton = (Button) findViewById(R.id.cancel);
 
 
         mRowId = (savedInstanceState == null) ? null :
@@ -84,6 +85,7 @@ public class NoteEdit extends Activity {
             mTitleText.setText(extras != null ? extras.getString(NotesDbAdapter.KEY_FROM,""): "");
             mFromText.setText(extras != null ? extras.getString(NotesDbAdapter.KEY_FROM,""): "");
             mSubjText.setText(extras != null ? extras.getString(NotesDbAdapter.KEY_SUBJ,""): "");
+            mDelCb.setChecked(extras != null && extras.getBoolean(NotesDbAdapter.KEY_DEL,false));
 		}
 
 
@@ -98,6 +100,19 @@ public class NoteEdit extends Activity {
         confirmButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View view) {
+                setResult(RESULT_OK);
+                finish();
+            }
+
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View view) {
+                mTitleText.setText( "");
+                mFromText.setText( "");
+                mSubjText.setText("");
+                mDelCb.setChecked(false);
                 setResult(RESULT_OK);
                 finish();
             }

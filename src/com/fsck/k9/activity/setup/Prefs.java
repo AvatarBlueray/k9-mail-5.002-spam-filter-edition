@@ -79,6 +79,7 @@ public class Prefs extends K9PreferenceActivity {
     private static final String PREFERENCE_MESSAGEVIEW_RETURN_TO_LIST = "messageview_return_to_list";
     private static final String PREFERENCE_MESSAGEVIEW_SHOW_NEXT = "messageview_show_next";
     private static final String PREFERENCE_QUIET_TIME_ENABLED = "quiet_time_enabled";
+    private static final String PREFERENCE_NOTIFY_SPAM_ANYWERE = "notify_spam_anywere";
     private static final String PREFERENCE_QUIET_TIME_STARTS = "quiet_time_starts";
     private static final String PREFERENCE_QUIET_TIME_ENDS = "quiet_time_ends";
     private static final String PREFERENCE_NOTIF_QUICK_DELETE = "notification_quick_delete";
@@ -141,6 +142,7 @@ public class Prefs extends K9PreferenceActivity {
     private CheckBoxListPreference mVisibleRefileActions;
 
     private CheckBoxPreference mQuietTimeEnabled;
+    private CheckBoxPreference mNotifySpamEnywere;
     private com.fsck.k9.preferences.TimePickerPreference mQuietTimeStarts;
     private com.fsck.k9.preferences.TimePickerPreference mQuietTimeEnds;
     private ListPreference mNotificationQuickDelete;
@@ -307,6 +309,9 @@ public class Prefs extends K9PreferenceActivity {
         mQuietTimeEnabled = (CheckBoxPreference) findPreference(PREFERENCE_QUIET_TIME_ENABLED);
         mQuietTimeEnabled.setChecked(K9.getQuietTimeEnabled());
 
+        mNotifySpamEnywere = (CheckBoxPreference) findPreference(PREFERENCE_NOTIFY_SPAM_ANYWERE);
+        mNotifySpamEnywere.setChecked(K9.getNotifySpamAnywere());
+
         mQuietTimeStarts = (TimePickerPreference) findPreference(PREFERENCE_QUIET_TIME_STARTS);
         mQuietTimeStarts.setDefaultValue(K9.getQuietTimeStarts());
         mQuietTimeStarts.setSummary(K9.getQuietTimeStarts());
@@ -467,6 +472,7 @@ public class Prefs extends K9PreferenceActivity {
         K9.setMessageViewShowNext(mShowNext.isChecked());
         K9.setAutofitWidth(mAutofitWidth.isChecked());
         K9.setQuietTimeEnabled(mQuietTimeEnabled.isChecked());
+        K9.setNotifySpamAnywere(mNotifySpamEnywere.isChecked());
 
         boolean[] enabledRefileActions = mVisibleRefileActions.getCheckedItems();
         K9.setMessageViewDeleteActionVisible(enabledRefileActions[VISIBLE_REFILE_ACTIONS_DELETE]);

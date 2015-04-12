@@ -90,7 +90,7 @@ public class K9RemoteControl {
      */
     public final static String K9_POLL_CLASSES = "com.fsck.k9.K9RemoteControl.pollClasses";
 
-    public final static String[] K9_POLL_FREQUENCIES = { "-1", "1", "5", "10", "15", "30", "60", "120", "180", "360", "720", "1440"};
+    public final static String[] K9_POLL_FREQUENCIES = { "-1", "1", "2", "3", "4", "5", "10", "15", "30", "60", "120", "180", "360", "720", "1440"};
     /**
      * Key for the {@link Intent} Extra to set with the desired poll frequency.  The value is a String representing a number of minutes.
      * Acceptable values are available in K9_POLL_FREQUENCIES
