@@ -1,0 +1,4105 @@
+diff -ruN sf/AndroidManifest.xml st/AndroidManifest.xml
+--- sf/AndroidManifest.xml	2015-06-09 15:37:32.000000000 +0300
++++ st/AndroidManifest.xml	2015-06-23 15:29:28.000000000 +0300
+@@ -213,6 +213,10 @@
+             </intent-filter>
+         </activity>
+         <activity
++            android:name="paul.arian.fileselector.FileSelectionActivity" />
++        <activity
++            android:name="paul.arian.fileselector.FolderSelectionActivity" />
++        <activity
+             android:name=".activity.MessageList"
+             android:configChanges="locale"
+             android:launchMode="singleTop"
+@@ -283,8 +287,14 @@
+             </intent-filter>
+         </activity>
+         <activity
+-            android:name=".activity.AccessibleEmailContentActivity"
+-            >
++        android:name=".activity.AccessibleEmailContentActivity"
++        >
++    </activity>
++        <activity
++            android:name=".spam_filter.Notepadv3" >
++        </activity>
++        <activity
++            android:name=".spam_filter.NoteEdit" >
+         </activity>
+         <activity android:name=".activity.EmailAddressList"
+             android:configChanges="locale"
+diff -ruN sf/build.gradle st/build.gradle
+--- sf/build.gradle	2015-06-09 15:37:32.000000000 +0300
++++ st/build.gradle	2015-06-23 15:15:20.000000000 +0300
+@@ -4,7 +4,7 @@
+   }
+ 
+   dependencies {
+-    classpath 'com.android.tools.build:gradle:0.12.2'
++    classpath 'com.android.tools.build:gradle:1.2.3'
+   }
+ }
+ 
+@@ -14,6 +14,7 @@
+   compile project(':plugins:Android-PullToRefresh:library')
+   compile project(':plugins:ckChangeLog:library')
+   compile project(':plugins:HoloColorPicker')
++  compile project('MultiFileSelector')
+   compile project(':plugins:openpgp-api-library')
+   compile 'com.android.support:support-v13:19.1.0'
+   compile fileTree(dir: 'libs', include: '*.jar')
+diff -ruN sf/gradle/wrapper/gradle-wrapper.properties st/gradle/wrapper/gradle-wrapper.properties
+--- sf/gradle/wrapper/gradle-wrapper.properties	2015-06-09 15:37:32.000000000 +0300
++++ st/gradle/wrapper/gradle-wrapper.properties	2015-06-23 14:57:04.000000000 +0300
+@@ -1,6 +1,6 @@
+-#Sat Jun 14 01:43:40 CEST 2014
+-distributionBase=GRADLE_USER_HOME
+-distributionPath=wrapper/dists
+-zipStoreBase=GRADLE_USER_HOME
+-zipStorePath=wrapper/dists
+-distributionUrl=http\://services.gradle.org/distributions/gradle-1.12-all.zip
++#Tue Jun 23 14:57:02 EEST 2015
++distributionBase=GRADLE_USER_HOME
++distributionPath=wrapper/dists
++zipStoreBase=GRADLE_USER_HOME
++zipStorePath=wrapper/dists
++distributionUrl=https\://services.gradle.org/distributions/gradle-2.2.1-all.zip
+diff -ruN sf/.gradle/2.2.1/taskArtifacts/cache.properties st/.gradle/2.2.1/taskArtifacts/cache.properties
+--- sf/.gradle/2.2.1/taskArtifacts/cache.properties	1970-01-01 03:00:00.000000000 +0300
++++ st/.gradle/2.2.1/taskArtifacts/cache.properties	2015-06-23 15:03:08.000000000 +0300
+@@ -0,0 +1 @@
++#Tue Jun 23 15:03:07 EEST 2015
+Binary files sf/.gradle/2.2.1/taskArtifacts/cache.properties.lock and st/.gradle/2.2.1/taskArtifacts/cache.properties.lock differ
+Binary files sf/.gradle/2.2.1/taskArtifacts/fileHashes.bin and st/.gradle/2.2.1/taskArtifacts/fileHashes.bin differ
+Binary files sf/.gradle/2.2.1/taskArtifacts/fileSnapshots.bin and st/.gradle/2.2.1/taskArtifacts/fileSnapshots.bin differ
+Binary files sf/.gradle/2.2.1/taskArtifacts/outputFileStates.bin and st/.gradle/2.2.1/taskArtifacts/outputFileStates.bin differ
+Binary files sf/.gradle/2.2.1/taskArtifacts/taskArtifacts.bin and st/.gradle/2.2.1/taskArtifacts/taskArtifacts.bin differ
+diff -ruN sf/import-summary.txt st/import-summary.txt
+--- sf/import-summary.txt	1970-01-01 03:00:00.000000000 +0300
++++ st/import-summary.txt	2015-06-23 14:58:46.000000000 +0300
+@@ -0,0 +1,40 @@
++ECLIPSE ANDROID PROJECT IMPORT SUMMARY
++======================================
++
++Ignored Files:
++--------------
++The following files were *not* copied into the new Gradle project; you
++should evaluate whether these are still needed in your project and if
++so manually move them:
++
++* Arabic_locale_sample.png
++* Japan_locale_sample.png
++* LICENSE
++* README.md
++* sample.png
++
++Moved Files:
++------------
++Android Gradle projects use a different directory structure than ADT
++Eclipse projects. Here's how the projects were restructured:
++
++* AndroidManifest.xml => MultiFileSelector\src\main\AndroidManifest.xml
++* libs\cwac-merge-1.0.4.jar => MultiFileSelector\libs\cwac-merge-1.0.4.jar
++* libs\picasso-2.4.0.jar => MultiFileSelector\libs\picasso-2.4.0.jar
++* res\ => MultiFileSelector\src\main\res\
++* src\ => MultiFileSelector\src\main\java\
++
++Next Steps:
++-----------
++You can now build the project. The Gradle project needs network
++connectivity to download dependencies.
++
++Bugs:
++-----
++If for some reason your project does not build, and you determine that
++it is due to a bug or limitation of the Eclipse to Gradle importer,
++please file a bug at http://b.android.com with category
++Component-Tools.
++
++(This import summary is for your information only, and can be deleted
++after import once you are satisfied with the results.)
+diff -ruN sf/k-9.iml st/k-9.iml
+--- sf/k-9.iml	1970-01-01 03:00:00.000000000 +0300
++++ st/k-9.iml	2015-06-23 15:15:36.000000000 +0300
+@@ -0,0 +1,100 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id="k-9" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$" external.system.id="GRADLE" external.system.module.group="" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":" />
++      </configuration>
++    </facet>
++    <facet type="android" name="Android">
++      <configuration>
++        <option name="SELECTED_BUILD_VARIANT" value="debug" />
++        <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
++        <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
++        <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
++        <option name="SOURCE_GEN_TASK_NAME" value="generateDebugSources" />
++        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugAndroidTest" />
++        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDebugAndroidTestSources" />
++        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateDebugAndroidTestSources" />
++        <option name="ALLOW_USER_CONFIGURATION" value="false" />
++        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/res" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="false">
++    <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
++    <output-test url="file://$MODULE_DIR$/build/intermediates/classes/androidTest/debug" />
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/java" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/tests/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/tests/src" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/coverage-instrumented-classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/libs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/ndk" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/proguard" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
++      <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
++    </content>
++    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
++    <orderEntry type="sourceFolder" forTests="false" />
++    <orderEntry type="library" exported="" name="commons-io-2.0.1" level="project" />
++    <orderEntry type="library" exported="" name="jutf7-1.0.1-SNAPSHOT" level="project" />
++    <orderEntry type="library" exported="" name="jzlib-1.0.7" level="project" />
++    <orderEntry type="library" exported="" name="apache-mime4j-dom-0.7.2" level="project" />
++    <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
++    <orderEntry type="library" exported="" name="htmlcleaner-2.2" level="project" />
++    <orderEntry type="library" exported="" name="apache-mime4j-core-0.7.2" level="project" />
++    <orderEntry type="library" exported="" name="support-v13-19.1.0" level="project" />
++    <orderEntry type="module" module-name="HoloColorPicker" exported="" />
++    <orderEntry type="module" module-name="ckChangeLog-library" exported="" />
++    <orderEntry type="module" module-name="openpgp-api-library" exported="" />
++    <orderEntry type="module" module-name="MultiFileSelector" exported="" />
++    <orderEntry type="module" module-name="library" exported="" />
++  </component>
++</module>
+\ No newline at end of file
+diff -ruN sf/local.properties st/local.properties
+--- sf/local.properties	1970-01-01 03:00:00.000000000 +0300
++++ st/local.properties	2015-06-23 14:56:22.000000000 +0300
+@@ -0,0 +1,11 @@
++## This file is automatically generated by Android Studio.
++# Do not modify this file -- YOUR CHANGES WILL BE ERASED!
++#
++# This file must *NOT* be checked into Version Control Systems,
++# as it contains information specific to your local configuration.
++#
++# Location of the SDK. This is only used by Gradle.
++# For customization when using a Version Control System, please read the
++# header note.
++#Tue Jun 23 14:56:21 EEST 2015
++sdk.dir=C\:\\Users\\iaiaoee\\AppData\\Local\\Android\\sdk
+diff -ruN sf/MultiFileSelector/build.gradle st/MultiFileSelector/build.gradle
+--- sf/MultiFileSelector/build.gradle	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/build.gradle	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,23 @@
++apply plugin: 'com.android.library'
++
++android {
++    compileSdkVersion 19
++    buildToolsVersion "19.1.0"
++
++    defaultConfig {
++        minSdkVersion 8
++        targetSdkVersion 21
++    }
++
++    buildTypes {
++        release {
++            minifyEnabled false
++            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
++        }
++    }
++}
++
++dependencies {
++    compile files('libs/cwac-merge-1.0.4.jar')
++    compile files('libs/picasso-2.4.0.jar')
++}
+Binary files sf/MultiFileSelector/libs/cwac-merge-1.0.4.jar and st/MultiFileSelector/libs/cwac-merge-1.0.4.jar differ
+Binary files sf/MultiFileSelector/libs/picasso-2.4.0.jar and st/MultiFileSelector/libs/picasso-2.4.0.jar differ
+diff -ruN sf/MultiFileSelector/MultiFileSelector.iml st/MultiFileSelector/MultiFileSelector.iml
+--- sf/MultiFileSelector/MultiFileSelector.iml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/MultiFileSelector.iml	2015-06-23 15:06:46.000000000 +0300
+@@ -0,0 +1,93 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":MultiFileSelector" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="k-9" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":MultiFileSelector" />
++      </configuration>
++    </facet>
++    <facet type="android" name="Android">
++      <configuration>
++        <option name="SELECTED_BUILD_VARIANT" value="debug" />
++        <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
++        <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
++        <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
++        <option name="SOURCE_GEN_TASK_NAME" value="generateDebugSources" />
++        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugAndroidTest" />
++        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDebugAndroidTestSources" />
++        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateDebugAndroidTestSources" />
++        <option name="ALLOW_USER_CONFIGURATION" value="false" />
++        <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
++        <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
++        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res" />
++        <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
++        <option name="LIBRARY_PROJECT" value="true" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="false">
++    <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
++    <output-test url="file://$MODULE_DIR$/build/intermediates/classes/androidTest/debug" />
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/java" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/coverage-instrumented-classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/libs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/ndk" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/proguard" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
++      <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
++    </content>
++    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
++    <orderEntry type="sourceFolder" forTests="false" />
++    <orderEntry type="library" exported="" name="cwac-merge-1.0.4" level="project" />
++    <orderEntry type="library" exported="" name="picasso-2.4.0" level="project" />
++  </component>
++</module>
+\ No newline at end of file
+diff -ruN sf/MultiFileSelector/src/main/AndroidManifest.xml st/MultiFileSelector/src/main/AndroidManifest.xml
+--- sf/MultiFileSelector/src/main/AndroidManifest.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/AndroidManifest.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,14 @@
++<?xml version="1.0" encoding="utf-8"?>
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="paul.arian.fileselector"
++    android:versionCode="1"
++    android:versionName="1.0" >
++
++    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
++    <uses-sdk
++        android:minSdkVersion="8"
++        android:targetSdkVersion="21" />
++
++    
++
++</manifest>
+diff -ruN sf/MultiFileSelector/src/main/java/paul/arian/fileselector/CheckableRelativeLayout.java st/MultiFileSelector/src/main/java/paul/arian/fileselector/CheckableRelativeLayout.java
+--- sf/MultiFileSelector/src/main/java/paul/arian/fileselector/CheckableRelativeLayout.java	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/java/paul/arian/fileselector/CheckableRelativeLayout.java	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,104 @@
++package paul.arian.fileselector;
++/**
++ * Created by Paul on 3/7/14.
++ */
++import java.util.ArrayList;
++import java.util.List;
++
++import android.content.Context;
++import android.util.AttributeSet;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.Checkable;
++import android.widget.RelativeLayout;
++
++/**
++ * Extension of a relative layout to provide a checkable behaviour
++ *
++ * @author marvinlabs
++ */
++public class CheckableRelativeLayout extends RelativeLayout implements
++        Checkable {
++
++    private boolean isChecked;
++    private List<Checkable> checkableViews;
++
++    public CheckableRelativeLayout(Context context, AttributeSet attrs,
++                                   int defStyle) {
++        super(context, attrs, defStyle);
++        initialise(attrs);
++    }
++
++    public CheckableRelativeLayout(Context context, AttributeSet attrs) {
++        super(context, attrs);
++        initialise(attrs);
++    }
++
++    public CheckableRelativeLayout(Context context, int checkableId) {
++        super(context);
++        initialise(null);
++    }
++
++    /*
++      * @see android.widget.Checkable#isChecked()
++      */
++    public boolean isChecked() {
++        return isChecked;
++    }
++
++    /*
++      * @see android.widget.Checkable#setChecked(boolean)
++      */
++    public void setChecked(boolean isChecked) {
++        this.isChecked = isChecked;
++        for (Checkable c : checkableViews) {
++            c.setChecked(isChecked);
++        }
++    }
++
++    /*
++      * @see android.widget.Checkable#toggle()
++      */
++    public void toggle() {
++        this.isChecked = !this.isChecked;
++        for (Checkable c : checkableViews) {
++            c.toggle();
++        }
++    }
++
++    @Override
++    protected void onFinishInflate() {
++        super.onFinishInflate();
++
++        final int childCount = this.getChildCount();
++        for (int i = 0; i < childCount; ++i) {
++            findCheckableChildren(this.getChildAt(i));
++        }
++    }
++
++    /**
++     * Read the custom XML attributes
++     */
++    private void initialise(AttributeSet attrs) {
++        this.isChecked = false;
++        this.checkableViews = new ArrayList<Checkable>(5);
++    }
++
++    /**
++     * Add to our checkable list all the children of the view that implement the
++     * interface Checkable
++     */
++    private void findCheckableChildren(View v) {
++        if (v instanceof Checkable) {
++            this.checkableViews.add((Checkable) v);
++        }
++
++        if (v instanceof ViewGroup) {
++            final ViewGroup vg = (ViewGroup) v;
++            final int childCount = vg.getChildCount();
++            for (int i = 0; i < childCount; ++i) {
++                findCheckableChildren(vg.getChildAt(i));
++            }
++        }
++    }
++}
+diff -ruN sf/MultiFileSelector/src/main/java/paul/arian/fileselector/CustomList.java st/MultiFileSelector/src/main/java/paul/arian/fileselector/CustomList.java
+--- sf/MultiFileSelector/src/main/java/paul/arian/fileselector/CustomList.java	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/java/paul/arian/fileselector/CustomList.java	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,41 @@
++package paul.arian.fileselector;
++
++/**
++ * Created by Paul on 3/7/14.
++ */
++import android.app.Activity;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.ArrayAdapter;
++import android.widget.ImageView;
++import android.widget.TextView;
++
++import com.squareup.picasso.Picasso;
++
++import java.io.File;
++
++public class CustomList extends ArrayAdapter<String>{
++    private final Activity context;
++    private final String[] web;
++    String ParentFolder;
++    public CustomList(Activity context, String[] web,String path) {
++        super(context, R.layout.list_single, web);
++        this.context = context;
++        this.web = web;
++        ParentFolder = path;
++    }
++    @Override
++    public View getView(int position, View view, ViewGroup parent) {
++        LayoutInflater inflater = context.getLayoutInflater();
++        View rowView= inflater.inflate(R.layout.list_single, null, true);
++        TextView txtTitle = (TextView) rowView.findViewById(R.id.txt);
++        ImageView imageView = (ImageView) rowView.findViewById(R.id.img);
++        txtTitle.setText(web[position]);
++        Picasso.with(context).load(
++                new File(
++                        ParentFolder+"/"+web[position]
++                )).placeholder(R.drawable.document).resize(50, 50).into(imageView);
++        return rowView;
++    }
++}
+diff -ruN sf/MultiFileSelector/src/main/java/paul/arian/fileselector/CustomListSingleOnly.java st/MultiFileSelector/src/main/java/paul/arian/fileselector/CustomListSingleOnly.java
+--- sf/MultiFileSelector/src/main/java/paul/arian/fileselector/CustomListSingleOnly.java	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/java/paul/arian/fileselector/CustomListSingleOnly.java	2015-06-23 14:58:46.000000000 +0300
+@@ -0,0 +1,48 @@
++package paul.arian.fileselector;
++
++/**
++ * Created by Paul on 3/7/14.
++ */
++import android.app.Activity;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.ArrayAdapter;
++import android.widget.ImageView;
++import android.widget.TextView;
++
++import com.squareup.picasso.Picasso;
++
++import java.io.File;
++
++public class CustomListSingleOnly extends ArrayAdapter<String>{
++    private final Activity context;
++    private final String[] web;
++    String ParentFolder;
++    public CustomListSingleOnly(Activity context, String[] web ,String path) {
++        super(context, R.layout.list_single_only, web);
++        this.context = context;
++        this.web = web;
++            ParentFolder = path;
++    }
++
++    @Override
++    public View getView(int position, View view, ViewGroup parent) {
++        LayoutInflater inflater = context.getLayoutInflater();
++        View rowView= inflater.inflate(R.layout.list_single_only, null, true);
++        TextView txtTitle = (TextView) rowView.findViewById(R.id.txt);
++        ImageView imageView = (ImageView) rowView.findViewById(R.id.img);
++        txtTitle.setText(web[position]);
++        if((new File(ParentFolder+"/"+web[position])).isDirectory()){
++            imageView.setImageResource(R.drawable.folder);//sets to folder
++        }else if((new File(ParentFolder+"/"+web[position])).isFile()) {//sets to file
++            Picasso.with(context).load(
++                    new File(
++                            ParentFolder + "/" + web[position]
++                    )).placeholder(R.drawable.document_gray).resize(50, 50).into(imageView);
++        }
++        return rowView;
++    }
++
++}
++
+diff -ruN sf/MultiFileSelector/src/main/java/paul/arian/fileselector/ExternalStorage.java st/MultiFileSelector/src/main/java/paul/arian/fileselector/ExternalStorage.java
+--- sf/MultiFileSelector/src/main/java/paul/arian/fileselector/ExternalStorage.java	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/java/paul/arian/fileselector/ExternalStorage.java	2015-06-23 15:58:52.000000000 +0300
+@@ -0,0 +1,141 @@
++package paul.arian.fileselector;
++
++import android.os.Environment;
++
++import java.io.File;
++import java.util.ArrayList;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++import java.util.Scanner;
++
++/**
++ * Created by iaiaoee on 23.06.2015.
++ */
++public class ExternalStorage {
++
++    public static final String SD_CARD = "sdCard";
++    public static final String EXTERNAL_SD_CARD = "externalSdCard";
++
++    /**
++     * @return True if the external storage is available. False otherwise.
++     */
++    public static boolean isAvailable() {
++        String state = Environment.getExternalStorageState();
++        if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
++            return true;
++        }
++        return false;
++    }
++
++    public static String getSdCardPath() {
++        return Environment.getExternalStorageDirectory().getPath() + "/";
++    }
++
++    /**
++     * @return True if the external storage is writable. False otherwise.
++     */
++    public static boolean isWritable() {
++        String state = Environment.getExternalStorageState();
++        if (Environment.MEDIA_MOUNTED.equals(state)) {
++            return true;
++        }
++        return false;
++
++    }
++
++    /**
++     * @return A map of all storage locations available
++     */
++    public static Map<String, File> getAllStorageLocations() {
++        Map<String, File> map = new HashMap<String, File>(10);
++
++        List<String> mMounts = new ArrayList<String>(10);
++        List<String> mVold = new ArrayList<String>(10);
++        mMounts.add("/mnt/sdcard");
++        mVold.add("/mnt/sdcard");
++
++        try {
++            File mountFile = new File("/proc/mounts");
++            if(mountFile.exists()){
++                Scanner scanner = new Scanner(mountFile);
++                while (scanner.hasNext()) {
++                    String line = scanner.nextLine();
++                    if (line.startsWith("/dev/block/vold/")) {
++                        String[] lineElements = line.split(" ");
++                        String element = lineElements[1];
++
++                        // don't add the default mount path
++                        // it's already in the list.
++                        if (!element.equals("/mnt/sdcard"))
++                            mMounts.add(element);
++                    }
++                }
++            }
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++
++        try {
++            File voldFile = new File("/system/etc/vold.fstab");
++            if(voldFile.exists()){
++                Scanner scanner = new Scanner(voldFile);
++                while (scanner.hasNext()) {
++                    String line = scanner.nextLine();
++                    if (line.startsWith("dev_mount")) {
++                        String[] lineElements = line.split(" ");
++                        String element = lineElements[2];
++
++                        if (element.contains(":"))
++                            element = element.substring(0, element.indexOf(":"));
++                        if (!element.equals("/mnt/sdcard"))
++                            mVold.add(element);
++                    }
++                }
++            }
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++
++
++        for (int i = 0; i < mMounts.size(); i++) {
++            String mount = mMounts.get(i);
++            if (!mVold.contains(mount))
++                mMounts.remove(i--);
++        }
++        mVold.clear();
++
++        List<String> mountHash = new ArrayList<String>(10);
++
++        for(String mount : mMounts){
++            File root = new File(mount);
++            if (root.exists() && root.isDirectory() && root.canWrite()) {
++                File[] list = root.listFiles();
++                String hash = "[";
++                if(list!=null){
++                    for(File f : list){
++                        hash += f.getName().hashCode()+":"+f.length()+", ";
++                    }
++                }
++                hash += "]";
++                if(!mountHash.contains(hash)){
++                    String key = SD_CARD + "_" + map.size();
++                    if (map.size() == 0) {
++                        key = SD_CARD;
++                    } else if (map.size() == 1) {
++                        key = EXTERNAL_SD_CARD;
++                    }
++                    mountHash.add(hash);
++                    map.put(key, root);
++                }
++            }
++        }
++
++        mMounts.clear();
++
++        if(map.isEmpty()){
++            map.put(SD_CARD, Environment.getExternalStorageDirectory());
++        }
++        return map;
++    }
++}
+\ No newline at end of file
+diff -ruN sf/MultiFileSelector/src/main/java/paul/arian/fileselector/FileSelectionActivity.java st/MultiFileSelector/src/main/java/paul/arian/fileselector/FileSelectionActivity.java
+--- sf/MultiFileSelector/src/main/java/paul/arian/fileselector/FileSelectionActivity.java	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/java/paul/arian/fileselector/FileSelectionActivity.java	2015-06-23 19:12:46.000000000 +0300
+@@ -0,0 +1,312 @@
++package paul.arian.fileselector;
++
++import java.io.File;
++import java.io.FileFilter;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Comparator;
++import java.util.Map;
++
++import android.app.Activity;
++import android.content.Intent;
++import android.os.Bundle;
++import android.os.Environment;
++import android.util.Log;
++import android.view.View;
++import android.widget.AdapterView;
++import android.widget.AdapterView.OnItemClickListener;
++import android.widget.ArrayAdapter;
++import android.widget.Button;
++import android.widget.ListView;
++import android.widget.TextView;
++import android.widget.Toast;
++
++import com.commonsware.cwac.merge.MergeAdapter;
++
++import paul.arian.fileselector.ExternalStorage;
++
++public class FileSelectionActivity extends Activity {
++
++    private static final String TAG = "FileSelection";
++    public static final String FILES_TO_UPLOAD = "upload";
++    File mainPath = new File(Environment.getExternalStorageDirectory()+"");
++    private ArrayList<File> resultFileList;
++
++    private ListView directoryView;
++    private ArrayList<File> directoryList = new ArrayList<File>();
++    private ArrayList<String> directoryNames = new ArrayList<String>();
++    //private ListView fileView;
++    private ArrayList<File> fileList = new ArrayList<File>();
++    private ArrayList<String> fileNames = new ArrayList<String>();
++    Button ok, all, cancel, storage , New;
++    TextView path;
++    Boolean Switch = false;
++
++
++    Boolean switcher = false;
++    String primary_sd;
++    String secondary_sd;
++
++    int index = 0;
++    int top = 0;
++
++    @Override
++    public void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_file_selection);
++        //getActionBar().setDisplayHomeAsUpEnabled(true);
++
++
++
++
++        directoryView = (ListView)findViewById(R.id.directorySelectionList);
++        ok = (Button)findViewById(R.id.ok);
++        all = (Button)findViewById(R.id.all);
++        cancel = (Button)findViewById(R.id.cancel);
++        storage = (Button)findViewById(R.id.storage);
++        New = (Button)findViewById(R.id.New);
++        path = (TextView)findViewById(R.id.folderpath);
++
++
++        loadLists();
++        New.setEnabled(false);
++
++
++        ExtStorageSearch();
++        if(secondary_sd==null){
++            storage.setEnabled(false);
++        }
++
++
++        directoryView.setOnItemClickListener(new OnItemClickListener() {
++            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
++
++                index = directoryView.getFirstVisiblePosition();
++                View v = directoryView.getChildAt(0);
++                top = (v == null) ? 0 : v.getTop();
++
++                File lastPath = mainPath;
++                try {
++                    if (position < directoryList.size()) {
++                        mainPath = directoryList.get(position);
++                        loadLists();
++                    }
++                }catch (Throwable e){
++                    mainPath = lastPath;
++                    loadLists();
++                }
++
++            }
++        });
++
++        ok.setOnClickListener(new View.OnClickListener(){
++            public void onClick(View v){
++                ok();
++            }
++        });
++
++
++
++        cancel.setOnClickListener(new View.OnClickListener(){
++            public void onClick(View v){
++                finish();
++            }
++        });
++
++        storage.setOnClickListener(new View.OnClickListener(){
++            public void onClick(View v){
++                try {
++                    if (!switcher) {
++                        mainPath = new File(secondary_sd);
++                        loadLists();
++                        switcher = true;
++                        storage.setText(getString(R.string.Int));
++                    } else {
++                        mainPath = new File(primary_sd);
++                        loadLists();
++                        switcher = false;
++                        storage.setText(getString(R.string.ext));
++                    }
++                }catch (Throwable e){
++
++                }
++            }
++        });
++
++        all.setOnClickListener(new View.OnClickListener() {
++            public void onClick(View v) {
++                if(!Switch){
++                    for (int i = directoryList.size(); i < directoryView.getCount(); i++){
++                        directoryView.setItemChecked(i, true);
++                    }
++                    all.setText(getString(R.string.none));
++                    Switch = true;
++                }else if(Switch){
++                    for (int i = directoryList.size(); i < directoryView.getCount(); i++) {
++                        directoryView.setItemChecked(i, false);
++                    }
++                    all.setText(getString(R.string.all));
++                    Switch = false;
++                }
++            }
++
++        });
++    }
++
++    public void onBackPressed() {
++        try {
++            if(mainPath.equals(Environment.getExternalStorageDirectory().getParentFile().getParentFile())){
++                finish();
++            }else{
++                File parent = mainPath.getParentFile();
++                mainPath = parent;
++                loadLists();
++                directoryView.setSelectionFromTop(index, top);
++            }
++
++        }catch (Throwable e){
++
++        }
++    }
++
++    public void ok(){
++        Log.d(TAG, "Upload clicked, finishing activity");
++
++
++        resultFileList = new ArrayList<File>();
++
++        for(int i = 0 ; i < directoryView.getCount(); i++){
++            if(directoryView.isItemChecked(i)){
++                resultFileList.add(fileList.get(i-directoryList.size()));
++            }
++        }
++        if(resultFileList.isEmpty()){
++            Log.d(TAG, "Nada seleccionado");
++            finish();
++        }
++        Log.d(TAG, "Files: "+resultFileList.toString());
++        Intent result = this.getIntent();
++        result.putExtra(FILES_TO_UPLOAD, resultFileList);
++        setResult(Activity.RESULT_OK, result);
++        finish();
++    }
++
++    private void loadLists(){
++        FileFilter fileFilter = new FileFilter() {
++            public boolean accept(File file) {
++                return file.isFile();
++            }
++        };
++        FileFilter directoryFilter = new FileFilter(){
++            public boolean accept(File file){
++                return file.isDirectory();
++            }
++        };
++
++        //if(mainPath.exists() && mainPath.length()>0){
++        //Lista de directorios
++        File[] tempDirectoryList = mainPath.listFiles(directoryFilter);
++
++        if (tempDirectoryList != null && tempDirectoryList.length > 1) {
++            Arrays.sort(tempDirectoryList, new Comparator<File>() {
++                @Override
++                public int compare(File object1, File object2) {
++                    return object1.getName().compareTo(object2.getName());
++                }
++            });
++        }
++
++        directoryList = new ArrayList<File>();
++        directoryNames = new ArrayList<String>();
++        for(File file: tempDirectoryList){
++            directoryList.add(file);
++            directoryNames.add(file.getName());
++        }
++        ArrayAdapter<String> directoryAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, directoryNames);
++
++
++        //Lista de ficheros
++        File[] tempFileList = mainPath.listFiles(fileFilter);
++
++        if (tempFileList != null && tempFileList.length > 1) {
++            Arrays.sort(tempFileList, new Comparator<File>() {
++                @Override
++                public int compare(File object1, File object2) {
++                    return object1.getName().compareTo(object2.getName());
++                }
++            });
++        }
++
++        fileList = new ArrayList<File>();
++        fileNames = new ArrayList<String>();
++        for(File file : tempFileList){
++            fileList.add(file);
++            fileNames.add(file.getName());
++        }
++
++
++
++        path.setText(mainPath.toString());
++        iconload();
++        setTitle(mainPath.getName());
++        //}
++    }
++
++    /**@Override
++    public boolean onCreateOptionsMenu(Menu menu) {
++    getMenuInflater().inflate(R.menu.activity_file_selection, menu);
++    return true;
++    }
++
++     @Override
++     public boolean onOptionsItemSelected(MenuItem item) {
++     switch (item.getItemId()) {
++     case android.R.id.home:
++     NavUtils.navigateUpFromSameTask(this);
++     return true;
++     }
++     return super.onOptionsItemSelected(item);
++     }**/
++
++    public void iconload(){
++        String[] foldernames = new String[directoryNames.size()];
++        foldernames = directoryNames.toArray(foldernames);
++
++        String[] filenames = new String[fileNames.size()];
++        filenames = fileNames.toArray(filenames);
++
++        CustomListSingleOnly adapter1 = new CustomListSingleOnly(FileSelectionActivity.this, directoryNames.toArray(foldernames), mainPath.getPath());
++        CustomList adapter2 = new CustomList(FileSelectionActivity.this, fileNames.toArray(filenames), mainPath.getPath());
++
++
++        MergeAdapter adap = new MergeAdapter();
++
++        adap.addAdapter(adapter1);
++        adap.addAdapter(adapter2);
++
++
++        directoryView.setAdapter(adap);
++    }
++
++    public void ExtStorageSearch(){
++        String[] extStorlocs = {"/storage/sdcard1","/storage/extsdcard","/storage/sdcard0/external_sdcard","/mnt/extsdcard",
++                "/mnt/sdcard/external_sd","/mnt/external_sd","/mnt/media_rw/sdcard1","/removable/microsd","/mnt/emmc",
++                "/storage/external_SD","/storage/ext_sd","/storage/removable/sdcard1","/data/sdext","/data/sdext2",
++                "/data/sdext3","/data/sdext4","/storage/sdcard0"};
++
++        //First Attempt
++        primary_sd = System.getenv("EXTERNAL_STORAGE");
++        //secondary_sd = System.getenv("SECONDARY_STORAGE");
++
++        Map<String, File> externalLocations = ExternalStorage.getAllStorageLocations();
++        secondary_sd = externalLocations.get(ExternalStorage.EXTERNAL_SD_CARD).toString();
++
++
++
++
++
++    }
++
++
++
++}
+diff -ruN sf/MultiFileSelector/src/main/java/paul/arian/fileselector/FolderSelectionActivity.java st/MultiFileSelector/src/main/java/paul/arian/fileselector/FolderSelectionActivity.java
+--- sf/MultiFileSelector/src/main/java/paul/arian/fileselector/FolderSelectionActivity.java	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/java/paul/arian/fileselector/FolderSelectionActivity.java	2015-06-23 14:58:46.000000000 +0300
+@@ -0,0 +1,293 @@
++package paul.arian.fileselector;
++
++import java.io.File;
++import java.io.FileFilter;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Comparator;
++
++import android.app.Activity;
++import android.app.AlertDialog;
++import android.content.DialogInterface;
++import android.content.Intent;
++import android.os.Bundle;
++import android.os.Environment;
++import android.view.View;
++import android.widget.AdapterView;
++import android.widget.AdapterView.OnItemClickListener;
++import android.widget.ArrayAdapter;
++import android.widget.Button;
++import android.widget.EditText;
++import android.widget.ListView;
++import android.widget.TextView;
++
++import com.commonsware.cwac.merge.MergeAdapter;
++
++public class FolderSelectionActivity extends Activity {
++
++    private static final String TAG = "FileSelection";
++    private static final String FILES_TO_UPLOAD = "upload";
++    File mainPath = new File(Environment.getExternalStorageDirectory()+"");
++    private ArrayList<File> resultFileList;
++
++    private ListView directoryView;
++    private ArrayList<File> directoryList = new ArrayList<File>();
++    private ArrayList<String> directoryNames = new ArrayList<String>();
++    private ArrayList<File> fileList = new ArrayList<File>();
++    private ArrayList<String> fileNames = new ArrayList<String>();
++    Button ok, all,cancel,storage,New;
++    TextView path;
++
++
++
++
++    Boolean switcher = false;
++    String primary_sd;
++    String secondary_sd;
++
++    int index = 0;
++    int top = 0;
++
++    @Override
++    public void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_file_selection);
++        //getActionBar().setDisplayHomeAsUpEnabled(true);
++
++        directoryView = (ListView)findViewById(R.id.directorySelectionList);
++        ok = (Button)findViewById(R.id.ok);
++        all = (Button)findViewById(R.id.all);
++        cancel = (Button)findViewById(R.id.cancel);
++        storage = (Button)findViewById(R.id.storage);
++        New = (Button)findViewById(R.id.New);
++        path = (TextView)findViewById(R.id.folderpath);
++
++        all.setEnabled(false);
++
++
++        loadLists();
++
++        ExtStorageSearch();
++        if(secondary_sd==null){
++            storage.setEnabled(false);
++        }
++
++        directoryView.setOnItemClickListener(new OnItemClickListener() {
++            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
++
++                index = directoryView.getFirstVisiblePosition();
++                View v = directoryView.getChildAt(0);
++                top = (v == null) ? 0 : v.getTop();
++
++                File lastPath = mainPath;
++                try {
++                    if (position < directoryList.size()) {
++                        mainPath = directoryList.get(position);
++                        loadLists();
++                    }
++                }catch(Throwable e){
++                    mainPath = lastPath;
++                    loadLists();
++                }
++            }
++        });
++
++        ok.setOnClickListener(new View.OnClickListener(){
++            public void onClick(View v){
++                ok();
++            }
++        });
++
++        cancel.setOnClickListener(new View.OnClickListener(){
++            public void onClick(View v){
++                finish();
++            }
++        });
++
++        storage.setOnClickListener(new View.OnClickListener(){
++            public void onClick(View v){
++                try {
++                    if (!switcher) {
++                        mainPath = new File(secondary_sd);
++                        loadLists();
++                        switcher = true;
++                        storage.setText(getString(R.string.Int));
++                    } else {
++                        mainPath = new File(primary_sd);
++                        loadLists();
++                        switcher = false;
++                        storage.setText(getString(R.string.ext));
++                    }
++                }catch (Throwable e){
++
++                }
++            }
++        });
++
++        New.setOnClickListener(new View.OnClickListener(){
++            public void onClick(View v){
++                AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
++                alert.setTitle( getString(R.string.New) );
++                alert.setMessage( getString(R.string.CNew) );
++
++                final EditText input = new EditText(v.getContext());
++                alert.setView(input);
++
++                alert.setPositiveButton(getString(R.string.create), new DialogInterface.OnClickListener() {
++                    public void onClick(DialogInterface dialog, int whichButton) {
++                        String fileName = input.getText().toString();
++                        // Verify if a value has been entered.
++                        if(fileName != null && fileName.length() > 0) {
++                            // Notify the listeners.
++                            File newFolder = new File(mainPath.getPath()+"/"+fileName+"/");
++                            newFolder.mkdirs();
++                            loadLists();
++                        }
++                    }
++                });
++                alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
++                    public void onClick(DialogInterface dialog, int whichButton) {
++                        // Do nothing, automatically the dialog is going to be closed.
++                    }
++                });
++
++                // Show the dialog.
++                alert.show();
++
++            }
++        });
++    }
++
++    @Override
++    public void onBackPressed() {
++        try {
++            if(mainPath.equals(Environment.getExternalStorageDirectory().getParentFile().getParentFile())){
++                finish();
++            }else{
++                File parent = mainPath.getParentFile();
++                mainPath = parent;
++                loadLists();
++                directoryView.setSelectionFromTop(index, top);
++            }
++
++        }catch (Throwable e){
++
++        }
++    }
++
++    public void ok(){
++        Intent result = this.getIntent();
++        result.putExtra(FILES_TO_UPLOAD, mainPath);
++        setResult(Activity.RESULT_OK, result);
++        finish();
++    }
++
++    private void loadLists(){
++        FileFilter fileFilter = new FileFilter() {
++            public boolean accept(File file) {
++                return file.isFile();
++            }
++        };
++        FileFilter directoryFilter = new FileFilter(){
++            public boolean accept(File file){
++                return file.isDirectory();
++            }
++        };
++
++        //if(mainPath.exists() && mainPath.length()>0){
++            //Lista de directorios
++            File[] tempDirectoryList = mainPath.listFiles(directoryFilter);
++
++        if (tempDirectoryList != null && tempDirectoryList.length > 1) {
++            Arrays.sort(tempDirectoryList, new Comparator<File>() {
++                @Override
++                public int compare(File object1, File object2) {
++                    return object1.getName().compareTo(object2.getName());
++                }
++            });
++        }
++
++
++        directoryList = new ArrayList<File>();
++            directoryNames = new ArrayList<String>();
++            for(File file: tempDirectoryList){
++                directoryList.add(file);
++                directoryNames.add(file.getName());
++            }
++            ArrayAdapter<String> directoryAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, directoryNames);
++            directoryView.setAdapter(directoryAdapter);
++
++            //Lista de ficheros
++            File[] tempFileList = mainPath.listFiles(fileFilter);
++
++        if (tempFileList != null && tempFileList.length > 1) {
++            Arrays.sort(tempFileList, new Comparator<File>() {
++                @Override
++                public int compare(File object1, File object2) {
++                    return object1.getName().compareTo(object2.getName());
++                }
++            });
++        }
++
++            fileList = new ArrayList<File>();
++            fileNames = new ArrayList<String>();
++            for(File file : tempFileList){
++                fileList.add(file);
++                fileNames.add(file.getName());
++            }
++
++
++
++            path.setText(mainPath.toString());
++            iconload();
++       // }
++    }
++
++    public void iconload(){
++        String[] foldernames = new String[directoryNames.size()];
++        foldernames = directoryNames.toArray(foldernames);
++
++        String[] filenames = new String[fileNames.size()];
++        filenames = fileNames.toArray(filenames);
++
++        CustomListSingleOnly adapter1 = new CustomListSingleOnly(FolderSelectionActivity.this, directoryNames.toArray(foldernames), mainPath.getPath());
++        CustomListSingleOnly adapter2 = new CustomListSingleOnly(FolderSelectionActivity.this, fileNames.toArray(filenames), mainPath.getPath());
++
++
++        MergeAdapter adap = new MergeAdapter();
++
++        adap.addAdapter(adapter1);
++        adap.addAdapter(adapter2);
++
++
++        directoryView.setAdapter(adap);
++    }
++
++    public void ExtStorageSearch(){
++        String[] extStorlocs = {"/storage/sdcard1","/storage/extsdcard","/storage/sdcard0/external_sdcard","/mnt/extsdcard",
++                "/mnt/sdcard/external_sd","/mnt/external_sd","/mnt/media_rw/sdcard1","/removable/microsd","/mnt/emmc",
++                "/storage/external_SD","/storage/ext_sd","/storage/removable/sdcard1","/data/sdext","/data/sdext2",
++                "/data/sdext3","/data/sdext4","/storage/sdcard0"};
++
++        //First Attempt
++        primary_sd = System.getenv("EXTERNAL_STORAGE");
++        secondary_sd = System.getenv("SECONDARY_STORAGE");
++
++
++        if(primary_sd == null) {
++            primary_sd = Environment.getExternalStorageDirectory()+"";
++        }
++        if(secondary_sd == null) {//if fail, search among known list of extStorage Locations
++            for(String string: extStorlocs){
++                if((new File(string)).exists() && (new File(string)).isDirectory() ){
++                    secondary_sd = string;
++                    break;
++                }
++            }
++        }
++
++    }
++
++
++
++}
+Binary files sf/MultiFileSelector/src/main/res/drawable-hdpi/blank.png and st/MultiFileSelector/src/main/res/drawable-hdpi/blank.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-hdpi/btn_check_label_background.9.png and st/MultiFileSelector/src/main/res/drawable-hdpi/btn_check_label_background.9.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-hdpi/btn_check_off_holo_dark.png and st/MultiFileSelector/src/main/res/drawable-hdpi/btn_check_off_holo_dark.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-hdpi/btn_check_on_holo_dark.png and st/MultiFileSelector/src/main/res/drawable-hdpi/btn_check_on_holo_dark.png differ
+diff -ruN sf/MultiFileSelector/src/main/res/drawable-hdpi/customcheckbox_background.xml st/MultiFileSelector/src/main/res/drawable-hdpi/customcheckbox_background.xml
+--- sf/MultiFileSelector/src/main/res/drawable-hdpi/customcheckbox_background.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/drawable-hdpi/customcheckbox_background.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,4 @@
++<?xml version="1.0" encoding="utf-8"?>
++<selector xmlns:android="http://schemas.android.com/apk/res/android">
++    <item android:drawable="@drawable/btn_check_label_background" />
++</selector>
+\ No newline at end of file
+diff -ruN sf/MultiFileSelector/src/main/res/drawable-hdpi/customcheckbox.xml st/MultiFileSelector/src/main/res/drawable-hdpi/customcheckbox.xml
+--- sf/MultiFileSelector/src/main/res/drawable-hdpi/customcheckbox.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/drawable-hdpi/customcheckbox.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,6 @@
++<selector xmlns:android="http://schemas.android.com/apk/res/android">
++    <item android:state_checked="false"
++        android:drawable="@drawable/btn_check_off_holo_dark" />
++    <item android:state_checked="true"
++        android:drawable="@drawable/btn_check_on_holo_dark" />
++</selector>
+\ No newline at end of file
+Binary files sf/MultiFileSelector/src/main/res/drawable-hdpi/document_gray.png and st/MultiFileSelector/src/main/res/drawable-hdpi/document_gray.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-hdpi/document.png and st/MultiFileSelector/src/main/res/drawable-hdpi/document.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-hdpi/folder.png and st/MultiFileSelector/src/main/res/drawable-hdpi/folder.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-ldpi/document_gray.png and st/MultiFileSelector/src/main/res/drawable-ldpi/document_gray.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-ldpi/document.png and st/MultiFileSelector/src/main/res/drawable-ldpi/document.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-ldpi/folder.png and st/MultiFileSelector/src/main/res/drawable-ldpi/folder.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-ldpi/ic_launcher.png and st/MultiFileSelector/src/main/res/drawable-ldpi/ic_launcher.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-mdpi/document_gray.png and st/MultiFileSelector/src/main/res/drawable-mdpi/document_gray.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-mdpi/document.png and st/MultiFileSelector/src/main/res/drawable-mdpi/document.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-mdpi/folder.png and st/MultiFileSelector/src/main/res/drawable-mdpi/folder.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-mdpi/ic_launcher.png and st/MultiFileSelector/src/main/res/drawable-mdpi/ic_launcher.png differ
+Binary files sf/MultiFileSelector/src/main/res/drawable-xxhdpi/ic_launcher.png and st/MultiFileSelector/src/main/res/drawable-xxhdpi/ic_launcher.png differ
+diff -ruN sf/MultiFileSelector/src/main/res/layout/activity_file_selection.xml st/MultiFileSelector/src/main/res/layout/activity_file_selection.xml
+--- sf/MultiFileSelector/src/main/res/layout/activity_file_selection.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/layout/activity_file_selection.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,75 @@
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:id="@+id/fileSelectionContainer"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:orientation="vertical" >
++
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:orientation="horizontal"
++        android:weightSum="60">
++    <Button
++        android:layout_width="fill_parent"
++        android:layout_height="wrap_content"
++        android:text="@string/New"
++        android:layout_weight="30"
++        android:layout_marginBottom="10dp"
++        android:id="@+id/New"/>
++
++        <Button
++            android:layout_width="fill_parent"
++            android:layout_height="wrap_content"
++            android:text="@string/ext"
++            android:layout_weight="30"
++            android:layout_marginBottom="10dp"
++            android:id="@+id/storage"/>
++
++    </LinearLayout>
++    <TextView
++        android:id="@+id/folderpath"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:gravity="center_horizontal"
++        android:text=""
++        android:textSize="15dp" />
++
++
++    
++    <ListView
++        android:id="@+id/directorySelectionList"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"
++        android:layout_weight="1"
++        android:choiceMode="multipleChoice" />
++
++
++
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:orientation="horizontal"
++        android:weightSum="90">
++
++        <Button
++            android:layout_width="fill_parent"
++            android:layout_height="wrap_content"
++            android:text="@string/cancel"
++            android:id="@+id/cancel"
++            android:layout_weight="30" />
++
++    <Button
++        android:layout_width="fill_parent"
++        android:layout_height="wrap_content"
++        android:text="@string/all"
++        android:id="@+id/all"
++        android:layout_weight="30" />
++
++        <Button
++            android:layout_width="fill_parent"
++            android:layout_height="wrap_content"
++            android:text="@string/ok"
++            android:id="@+id/ok"
++            android:layout_weight="30" />
++</LinearLayout>
++</LinearLayout>
+\ No newline at end of file
+diff -ruN sf/MultiFileSelector/src/main/res/layout/list_single_only.xml st/MultiFileSelector/src/main/res/layout/list_single_only.xml
+--- sf/MultiFileSelector/src/main/res/layout/list_single_only.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/layout/list_single_only.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,17 @@
++<?xml version="1.0" encoding="utf-8"?>
++<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent" >
++    <TableRow>
++        <ImageView
++            android:id="@+id/img"
++            android:layout_width="50dp"
++            android:layout_height="50dp"/>
++        <TextView
++            android:id="@+id/txt"
++            android:layout_width="wrap_content"
++            android:layout_height="50dp"
++            android:layout_margin="8dp"
++            android:maxLines="3" />
++    </TableRow>
++</TableLayout>
+\ No newline at end of file
+diff -ruN sf/MultiFileSelector/src/main/res/layout/list_single.xml st/MultiFileSelector/src/main/res/layout/list_single.xml
+--- sf/MultiFileSelector/src/main/res/layout/list_single.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/layout/list_single.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,29 @@
++<?xml version="1.0" encoding="utf-8"?>
++<paul.arian.fileselector.CheckableRelativeLayout
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent" >
++        <ImageView
++            android:id="@+id/img"
++            android:layout_width="50dp"
++            android:layout_height="50dp"
++            android:layout_alignParentLeft="true"/>
++        <TextView
++            android:id="@+id/txt"
++            android:layout_marginLeft="5dp"
++            android:layout_width="wrap_content"
++            android:layout_height="50dp"
++
++            android:layout_toRightOf="@+id/img"
++            android:layout_toLeftOf="@+id/myCheckBox"/>
++    <CheckBox
++        android:id="@+id/myCheckBox"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:focusable="false"
++        android:clickable="false"
++        android:layout_alignParentRight="true"
++        android:background="@drawable/customcheckbox_background"
++        android:button="@drawable/customcheckbox"
++        />
++</paul.arian.fileselector.CheckableRelativeLayout>
+\ No newline at end of file
+diff -ruN sf/MultiFileSelector/src/main/res/menu/main.xml st/MultiFileSelector/src/main/res/menu/main.xml
+--- sf/MultiFileSelector/src/main/res/menu/main.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/menu/main.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,9 @@
++<menu xmlns:android="http://schemas.android.com/apk/res/android" >
++
++    <item
++        android:id="@+id/action_settings"
++        android:orderInCategory="100"
++        android:showAsAction="never"
++        android:title="@string/action_settings"/>
++
++</menu>
+diff -ruN sf/MultiFileSelector/src/main/res/values/dimens.xml st/MultiFileSelector/src/main/res/values/dimens.xml
+--- sf/MultiFileSelector/src/main/res/values/dimens.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values/dimens.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,7 @@
++<resources>
++
++    <!-- Default screen margins, per the Android Design guidelines. -->
++    <dimen name="activity_horizontal_margin">16dp</dimen>
++    <dimen name="activity_vertical_margin">16dp</dimen>
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values/strings.xml st/MultiFileSelector/src/main/res/values/strings.xml
+--- sf/MultiFileSelector/src/main/res/values/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,20 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++
++    <string name="app_name">Parian File Selector Dialog</string>
++    <string name="action_settings">Settings</string>
++    <string name="ok">OK</string>
++    <string name="files">Files</string>
++    <string name="directories">Folders</string>
++    <string name="goUp">Go Up</string>
++    <string name="all">Check All</string>
++    <string name="cancel">Cancel</string>
++    <string name="none">Uncheck All</string>
++    <string name="ext">External</string>
++    <string name="Int">Internal</string>
++    <string name="New">New Folder</string>
++    <string name="CNew">Enter New Folder Name</string>
++    <string name="create">Create</string>
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values/styles.xml st/MultiFileSelector/src/main/res/values/styles.xml
+--- sf/MultiFileSelector/src/main/res/values/styles.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values/styles.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,20 @@
++<resources>
++
++    <!--
++        Base application theme, dependent on API level. This theme is replaced
++        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
++    -->
++    <style name="AppBaseTheme" parent="android:Theme.Light">
++        <!--
++            Theme customizations available in newer API levels can go in
++            res/values-vXX/styles.xml, while customizations related to
++            backward-compatibility can go here.
++        -->
++    </style>
++
++    <!-- Application theme. -->
++    <style name="AppTheme" parent="AppBaseTheme">
++        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
++    </style>
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-ar/strings.xml st/MultiFileSelector/src/main/res/values-ar/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-ar/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-ar/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">مربع حوار تحديد الملفات Parian</string>
++    <string name="action_settings">الإعدادات</string>
++    <string name="ok">موافق</string>
++    <string name="files">ملفات</string>
++    <string name="directories">مجلدات</string>
++    <string name="goUp">انتقل لأعلى</string>
++    <string name="all">تحديد الكل</string>
++    <string name="cancel">إلغاء</string>
++    <string name="none">إلغاء تحديد الكل</string>
++    <string name="ext">خارجي</string>
++    <string name="Int">داخلي</string>
++    <string name="New">مجلد جديد</string>
++    <string name="CNew">أدخل اسم المجلد الجديد</string>
++    <string name="create">إنشاء</string>
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-de/strings.xml st/MultiFileSelector/src/main/res/values-de/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-de/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-de/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Parian Datei-Auswahl-Dialog</string>
++    <string name="action_settings">Einstellungen</string>
++    <string name="ok">Ok</string>
++    <string name="files">Dateien</string>
++    <string name="directories">Ordner</string>
++    <string name="goUp">Nach oben</string>
++    <string name="all">Alle überprüfen</string>
++    <string name="cancel">Abbrechen</string>
++    <string name="none">Alle deaktivieren</string>
++    <string name="ext">Extern</string>
++    <string name="Int">Intern</string>
++    <string name="New">Neuer Ordner</string>
++    <string name="CNew">Geben Sie einen neuen Ordner-Namen ein</string>
++    <string name="create">Erstellen</string>
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-es/strings.xml st/MultiFileSelector/src/main/res/values-es/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-es/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-es/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,18 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Diálogo de selección de archivo parian</string>
++    <string name="action_settings">Ajustes</string>
++    <string name="ok">De acuerdo</string>
++    <string name="files">Archivos</string>
++    <string name="directories">Carpetas</string>
++    <string name="goUp">Ir arriba</string>
++    <string name="all">Seleccionar Todos</string>
++    <string name="cancel">Cancelar</string>
++    <string name="none">Deseleccionar Todos</string>
++    <string name="ext">Externo</string>
++    <string name="Int">Interno</string>
++    <string name="New">Nueva carpeta</string>
++    <string name="CNew">Introducir nombre de Nueva carpeta</string>
++    <string name="create">Crear</string>
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-fr/strings.xml st/MultiFileSelector/src/main/res/values-fr/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-fr/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-fr/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,18 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Dialogue de sélection de fichier de Parian</string>
++    <string name="action_settings">Paramètres</string>
++    <string name="ok">OK</string>
++    <string name="files">Fichiers</string>
++    <string name="directories">Dossiers</string>
++    <string name="goUp">Monter</string>
++    <string name="all">Tout cocher</string>
++    <string name="cancel">Annuler</string>
++    <string name="none">Tout décocher</string>
++    <string name="ext">Externe</string>
++    <string name="Int">Interne</string>
++    <string name="New">Nouveau dossier</string>
++    <string name="CNew">Saisissez le nouveau nom de dossier</string>
++    <string name="create">Créer</string>
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-id/strings.xml st/MultiFileSelector/src/main/res/values-id/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-id/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-id/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Dialog Pemilih File Parian</string>
++    <string name="action_settings">Pengaturan</string>
++    <string name="ok">OKE</string>
++    <string name="files">File</string>
++    <string name="directories">Folder</string>
++    <string name="goUp">Naik</string>
++    <string name="all">Centang Semua</string>
++    <string name="cancel">Batalkan</string>
++    <string name="none">Hapus Semua Centang</string>
++    <string name="ext">Eksternal</string>
++    <string name="Int">Internal</string>
++    <string name="New">Folder Baru</string>
++    <string name="CNew">Masukkan Nama Folder Baru</string>
++    <string name="create">Buat</string>
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-it/strings.xml st/MultiFileSelector/src/main/res/values-it/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-it/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-it/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Casella di dialogo del selettore di file Parian</string>
++    <string name="action_settings">Impostazioni</string>
++    <string name="ok">OK</string>
++    <string name="files">File</string>
++    <string name="directories">Cartelle</string>
++    <string name="goUp">Salire</string>
++    <string name="all">Selezionare tutto</string>
++    <string name="cancel">Cancellare</string>
++    <string name="none">Deselezionare tutto</string>
++    <string name="ext">Esterno</string>
++    <string name="Int">Interno</string>
++    <string name="New">Nuova cartella</string>
++    <string name="CNew">Inserire il nome della Nuova cartella</string>
++    <string name="create">Creare</string>
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-ja/strings.xml st/MultiFileSelector/src/main/res/values-ja/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-ja/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-ja/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Parian ファイルセレクターダイアログ</string>
++    <string name="action_settings">設定</string>
++    <string name="ok">OK</string>
++    <string name="files">ファイル</string>
++    <string name="directories">フォルダ</string>
++    <string name="goUp">上へ</string>
++    <string name="all">全てチェック</string>
++    <string name="cancel">キャンセル</string>
++    <string name="none">全てのチェクを外す</string>
++    <string name="ext">外部</string>
++    <string name="Int">内部</string>
++    <string name="New">新規フォルダ</string>
++    <string name="CNew">新しいフォルダ名を入力</string>
++    <string name="create">作成</string>
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-ko/strings.xml st/MultiFileSelector/src/main/res/values-ko/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-ko/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-ko/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Parian File Selector 대화 상자</string>
++    <string name="action_settings">설정</string>
++    <string name="ok">OK</string>
++    <string name="files">파일</string>
++    <string name="directories">폴더</string>
++    <string name="goUp">위로 이동</string>
++    <string name="all">모두 선택</string>
++    <string name="cancel">취소</string>
++    <string name="none">모두 선택 해제</string>
++    <string name="ext">외부</string>
++    <string name="Int">내부</string>
++    <string name="New">새 폴더</string>
++    <string name="CNew">새 폴더 이름 입력</string>
++    <string name="create">생성</string>
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-pt/strings.xml st/MultiFileSelector/src/main/res/values-pt/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-pt/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-pt/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,18 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Caixa de diálogo Seletor de ficheiros Parian</string>
++    <string name="action_settings">Definições</string>
++    <string name="ok">OK</string>
++    <string name="files">Ficheiros</string>
++    <string name="directories">Pastas</string>
++    <string name="goUp">Subir</string>
++    <string name="all">Selecionar tudo</string>
++    <string name="cancel">Cancelar</string>
++    <string name="none">Desmarcar tudo</string>
++    <string name="ext">Externo</string>
++    <string name="Int">Interno</string>
++    <string name="New">Nova pasta</string>
++    <string name="CNew">Introduza o nome da nova pasta</string>
++    <string name="create">Criar</string>
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-ru/strings.xml st/MultiFileSelector/src/main/res/values-ru/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-ru/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-ru/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Диалог выбора файла Parian</string>
++    <string name="action_settings">Настройки</string>
++    <string name="ok">Хорошо</string>
++    <string name="files">Файлы</string>
++    <string name="directories">Папки</string>
++    <string name="goUp">Вверх</string>
++    <string name="all">Проверить все</string>
++    <string name="cancel">Отмена</string>
++    <string name="none">Снять отметку со всех</string>
++    <string name="ext">Внешний</string>
++    <string name="Int">Внутренний</string>
++    <string name="New">Новая папка</string>
++    <string name="CNew">Ввести имя новой папки</string>
++    <string name="create">Создать</string>
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-sw600dp/dimens.xml st/MultiFileSelector/src/main/res/values-sw600dp/dimens.xml
+--- sf/MultiFileSelector/src/main/res/values-sw600dp/dimens.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-sw600dp/dimens.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,8 @@
++<resources>
++
++    <!--
++         Customize dimensions originally defined in res/values/dimens.xml (such as
++         screen margins) for sw600dp devices (e.g. 7" tablets) here.
++    -->
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-sw720dp-land/dimens.xml st/MultiFileSelector/src/main/res/values-sw720dp-land/dimens.xml
+--- sf/MultiFileSelector/src/main/res/values-sw720dp-land/dimens.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-sw720dp-land/dimens.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,9 @@
++<resources>
++
++    <!--
++         Customize dimensions originally defined in res/values/dimens.xml (such as
++         screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
++    -->
++    <dimen name="activity_horizontal_margin">128dp</dimen>
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-v11/styles.xml st/MultiFileSelector/src/main/res/values-v11/styles.xml
+--- sf/MultiFileSelector/src/main/res/values-v11/styles.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-v11/styles.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,9 @@
++<resources>
++
++    <!--
++        Base application theme for API 11+. This theme completely replaces
++        AppBaseTheme from res/values/styles.xml on API 11+ devices.
++    -->
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-v14/styles.xml st/MultiFileSelector/src/main/res/values-v14/styles.xml
+--- sf/MultiFileSelector/src/main/res/values-v14/styles.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-v14/styles.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,10 @@
++<resources>
++
++    <!--
++        Base application theme for API 14+. This theme completely replaces
++        AppBaseTheme from BOTH res/values/styles.xml and
++        res/values-v11/styles.xml on API 14+ devices.
++    -->
++
++
++</resources>
+diff -ruN sf/MultiFileSelector/src/main/res/values-zh/strings.xml st/MultiFileSelector/src/main/res/values-zh/strings.xml
+--- sf/MultiFileSelector/src/main/res/values-zh/strings.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/MultiFileSelector/src/main/res/values-zh/strings.xml	2015-06-23 14:58:44.000000000 +0300
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?><resources>
++
++    <string name="app_name">Parian文件选择器对话框</string>
++    <string name="action_settings">设置</string>
++    <string name="ok">确定</string>
++    <string name="files">文件</string>
++    <string name="directories">文件夹</string>
++    <string name="goUp">向上</string>
++    <string name="all">全选</string>
++    <string name="cancel">取消</string>
++    <string name="none">取消全选</string>
++    <string name="ext">外部</string>
++    <string name="Int">内部</string>
++    <string name="New">新建文件夹</string>
++    <string name="CNew">输入新文件夹名称</string>
++    <string name="create">创建</string>
++
++
++</resources>
+diff -ruN sf/note_edit.xml st/note_edit.xml
+--- sf/note_edit.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/note_edit.xml	2015-06-20 23:27:48.000000000 +0300
+@@ -0,0 +1,101 @@
++<?xml version="1.0" encoding="utf-8"?>
++
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++	android:orientation="vertical" android:layout_width="match_parent"
++	android:layout_height="match_parent">
++	
++	<LinearLayout android:orientation="horizontal"
++		android:layout_width="match_parent"
++		android:layout_height="wrap_content">
++
++		<TextView android:layout_width="wrap_content"
++			android:layout_height="wrap_content" 
++			android:text="@string/spam_filter_title"
++            android:minWidth="45dp" />
++		<EditText android:id="@+id/title" 
++		  android:layout_width="wrap_content"
++			android:layout_height="wrap_content" 
++			android:layout_weight="1"/>
++	</LinearLayout>
++    <LinearLayout android:orientation="horizontal"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content">
++
++        <TextView android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="@string/spam_filter_from"
++            android:minWidth="45dp" />
++        <EditText android:id="@+id/from"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_weight="1"/>
++    </LinearLayout>
++    <LinearLayout android:orientation="horizontal"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content">
++
++        <TextView android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="@string/spam_filter_subj"
++            android:minWidth="45dp" />
++        <EditText android:id="@+id/subj"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_weight="1"/>
++    </LinearLayout>
++
++    <LinearLayout android:orientation="horizontal"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content">
++    <CheckBox
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="@string/spam_filter_hide"
++        android:id="@+id/hide"
++        android:layout_gravity="center_horizontal"
++        android:layout_weight="1" />
++
++    <CheckBox
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="@string/spam_filter_del"
++        android:id="@+id/del"
++        android:layout_weight="1" />
++
++    <Button android:id="@+id/confirm"
++        android:text="@string/spam_filter_confirm"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_weight="2" />
++</LinearLayout>
++
++    <LinearLayout android:orientation="vertical"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_weight="1"
++        android:gravity="center|bottom">
++
++        <TextView
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="request at Avatar.blueray@gmail.com"
++            android:id="@+id/textView"
++            android:textSize="20dp"
++            android:textAlignment="center" />
++    </LinearLayout>
++
++    <TextView
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="donation copy BTC wallet to clipboard"
++        android:id="@+id/textView2"
++        android:layout_gravity="center_horizontal"
++        android:textSize="20dp" />
++
++    <Button
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="1hRm41a1roEBHS7uxF9auvfekUYHvFctF"
++        android:id="@+id/donate"
++        android:layout_gravity="center_horizontal" />
++</LinearLayout>
+\ No newline at end of file
+diff -ruN sf/notes_list.xml st/notes_list.xml
+--- sf/notes_list.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/notes_list.xml	2015-06-20 23:27:48.000000000 +0300
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++      android:layout_width="wrap_content"
++    	android:layout_height="wrap_content">
++    
++    <ListView android:id="@+id/android:list"
++          android:layout_width="wrap_content"
++        	android:layout_height="wrap_content"/>
++  	<TextView android:id="@+id/android:empty"
++          android:layout_width="wrap_content"
++        	android:layout_height="wrap_content"
++        	android:text="@string/spam_filter_no_filter"/>
++</LinearLayout>
+diff -ruN sf/notes_row.xml st/notes_row.xml
+--- sf/notes_row.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/notes_row.xml	2015-06-20 23:27:48.000000000 +0300
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<TextView android:id="@+id/text1" xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="wrap_content"
++    android:layout_height="wrap_content"
++    android:textSize="30dp" />
+diff -ruN sf/plugins/Android-PullToRefresh/Android-PullToRefresh.iml st/plugins/Android-PullToRefresh/Android-PullToRefresh.iml
+--- sf/plugins/Android-PullToRefresh/Android-PullToRefresh.iml	1970-01-01 03:00:00.000000000 +0300
++++ st/plugins/Android-PullToRefresh/Android-PullToRefresh.iml	2015-06-23 14:57:40.000000000 +0300
+@@ -0,0 +1,25 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":plugins:Android-PullToRefresh" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="k-9.plugins" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":plugins:Android-PullToRefresh" />
++      </configuration>
++    </facet>
++    <facet type="java-gradle" name="Java-Gradle">
++      <configuration>
++        <option name="BUILD_FOLDER_PATH" value="$MODULE_DIR$/build" />
++        <option name="BUILDABLE" value="false" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="true">
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <excludeFolder url="file://$MODULE_DIR$/.gradle" />
++      <excludeFolder url="file://$MODULE_DIR$/build" />
++    </content>
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff -ruN sf/plugins/Android-PullToRefresh/library/library.iml st/plugins/Android-PullToRefresh/library/library.iml
+--- sf/plugins/Android-PullToRefresh/library/library.iml	1970-01-01 03:00:00.000000000 +0300
++++ st/plugins/Android-PullToRefresh/library/library.iml	2015-06-23 15:04:28.000000000 +0300
+@@ -0,0 +1,89 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":plugins:Android-PullToRefresh:library" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="k-9.plugins.Android-PullToRefresh" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":plugins:Android-PullToRefresh:library" />
++      </configuration>
++    </facet>
++    <facet type="android" name="Android">
++      <configuration>
++        <option name="SELECTED_BUILD_VARIANT" value="debug" />
++        <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
++        <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
++        <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
++        <option name="SOURCE_GEN_TASK_NAME" value="generateDebugSources" />
++        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugAndroidTest" />
++        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDebugAndroidTestSources" />
++        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateDebugAndroidTestSources" />
++        <option name="ALLOW_USER_CONFIGURATION" value="false" />
++        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/res" />
++        <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
++        <option name="LIBRARY_PROJECT" value="true" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="false">
++    <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
++    <output-test url="file://$MODULE_DIR$/build/intermediates/classes/androidTest/debug" />
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/java" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/coverage-instrumented-classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/libs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/ndk" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/proguard" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
++      <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
++    </content>
++    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff -ruN sf/plugins/ckChangeLog/ckChangeLog.iml st/plugins/ckChangeLog/ckChangeLog.iml
+--- sf/plugins/ckChangeLog/ckChangeLog.iml	1970-01-01 03:00:00.000000000 +0300
++++ st/plugins/ckChangeLog/ckChangeLog.iml	2015-06-23 14:57:40.000000000 +0300
+@@ -0,0 +1,25 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":plugins:ckChangeLog" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="k-9.plugins" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":plugins:ckChangeLog" />
++      </configuration>
++    </facet>
++    <facet type="java-gradle" name="Java-Gradle">
++      <configuration>
++        <option name="BUILD_FOLDER_PATH" value="$MODULE_DIR$/build" />
++        <option name="BUILDABLE" value="false" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="true">
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <excludeFolder url="file://$MODULE_DIR$/.gradle" />
++      <excludeFolder url="file://$MODULE_DIR$/build" />
++    </content>
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff -ruN sf/plugins/ckChangeLog/library/ckChangeLog-library.iml st/plugins/ckChangeLog/library/ckChangeLog-library.iml
+--- sf/plugins/ckChangeLog/library/ckChangeLog-library.iml	1970-01-01 03:00:00.000000000 +0300
++++ st/plugins/ckChangeLog/library/ckChangeLog-library.iml	2015-06-23 15:04:28.000000000 +0300
+@@ -0,0 +1,89 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":plugins:ckChangeLog:library" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="k-9.plugins.ckChangeLog" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":plugins:ckChangeLog:library" />
++      </configuration>
++    </facet>
++    <facet type="android" name="Android">
++      <configuration>
++        <option name="SELECTED_BUILD_VARIANT" value="debug" />
++        <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
++        <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
++        <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
++        <option name="SOURCE_GEN_TASK_NAME" value="generateDebugSources" />
++        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugAndroidTest" />
++        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDebugAndroidTestSources" />
++        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateDebugAndroidTestSources" />
++        <option name="ALLOW_USER_CONFIGURATION" value="false" />
++        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/res" />
++        <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
++        <option name="LIBRARY_PROJECT" value="true" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="false">
++    <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
++    <output-test url="file://$MODULE_DIR$/build/intermediates/classes/androidTest/debug" />
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/java" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/coverage-instrumented-classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/libs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/ndk" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/proguard" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
++      <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
++    </content>
++    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff -ruN sf/plugins/HoloColorPicker/HoloColorPicker.iml st/plugins/HoloColorPicker/HoloColorPicker.iml
+--- sf/plugins/HoloColorPicker/HoloColorPicker.iml	1970-01-01 03:00:00.000000000 +0300
++++ st/plugins/HoloColorPicker/HoloColorPicker.iml	2015-06-23 15:04:28.000000000 +0300
+@@ -0,0 +1,89 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":plugins:HoloColorPicker" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="k-9.plugins" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":plugins:HoloColorPicker" />
++      </configuration>
++    </facet>
++    <facet type="android" name="Android">
++      <configuration>
++        <option name="SELECTED_BUILD_VARIANT" value="debug" />
++        <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
++        <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
++        <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
++        <option name="SOURCE_GEN_TASK_NAME" value="generateDebugSources" />
++        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugAndroidTest" />
++        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDebugAndroidTestSources" />
++        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateDebugAndroidTestSources" />
++        <option name="ALLOW_USER_CONFIGURATION" value="false" />
++        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/res" />
++        <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
++        <option name="LIBRARY_PROJECT" value="true" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="false">
++    <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
++    <output-test url="file://$MODULE_DIR$/build/intermediates/classes/androidTest/debug" />
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/java" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/coverage-instrumented-classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/libs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/ndk" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/proguard" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
++      <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
++    </content>
++    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff -ruN sf/plugins/openpgp-api-library/build.gradle st/plugins/openpgp-api-library/build.gradle
+--- sf/plugins/openpgp-api-library/build.gradle	2015-06-09 15:37:32.000000000 +0300
++++ st/plugins/openpgp-api-library/build.gradle	2015-06-23 14:57:04.000000000 +0300
+@@ -5,7 +5,7 @@
+     }
+ 
+     dependencies {
+-        classpath 'com.android.tools.build:gradle:0.12.2'
++        classpath 'com.android.tools.build:gradle:1.2.3'
+     }
+ }
+ 
+diff -ruN sf/plugins/openpgp-api-library/openpgp-api-library.iml st/plugins/openpgp-api-library/openpgp-api-library.iml
+--- sf/plugins/openpgp-api-library/openpgp-api-library.iml	1970-01-01 03:00:00.000000000 +0300
++++ st/plugins/openpgp-api-library/openpgp-api-library.iml	2015-06-23 15:04:28.000000000 +0300
+@@ -0,0 +1,86 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":plugins:openpgp-api-library" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="k-9.plugins" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":plugins:openpgp-api-library" />
++      </configuration>
++    </facet>
++    <facet type="android" name="Android">
++      <configuration>
++        <option name="SELECTED_BUILD_VARIANT" value="debug" />
++        <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
++        <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
++        <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
++        <option name="SOURCE_GEN_TASK_NAME" value="generateDebugSources" />
++        <option name="ASSEMBLE_TEST_TASK_NAME" value="assembleDebugAndroidTest" />
++        <option name="COMPILE_JAVA_TEST_TASK_NAME" value="compileDebugAndroidTestSources" />
++        <option name="TEST_SOURCE_GEN_TASK_NAME" value="generateDebugAndroidTestSources" />
++        <option name="ALLOW_USER_CONFIGURATION" value="false" />
++        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/res" />
++        <option name="LIBRARY_PROJECT" value="true" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="false">
++    <output url="file://$MODULE_DIR$/build/intermediates/classes/debug" />
++    <output-test url="file://$MODULE_DIR$/build/intermediates/classes/androidTest/debug" />
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/debug" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/generated/androidTest/debug" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/java" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/coverage-instrumented-classes" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex-cache" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/libs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/ndk" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/proguard" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
++      <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
++      <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
++    </content>
++    <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff -ruN sf/plugins/plugins.iml st/plugins/plugins.iml
+--- sf/plugins/plugins.iml	1970-01-01 03:00:00.000000000 +0300
++++ st/plugins/plugins.iml	2015-06-23 14:57:40.000000000 +0300
+@@ -0,0 +1,25 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":plugins" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="k-9" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":plugins" />
++      </configuration>
++    </facet>
++    <facet type="java-gradle" name="Java-Gradle">
++      <configuration>
++        <option name="BUILD_FOLDER_PATH" value="$MODULE_DIR$/build" />
++        <option name="BUILDABLE" value="false" />
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager" inherit-compiler-output="true">
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <excludeFolder url="file://$MODULE_DIR$/.gradle" />
++      <excludeFolder url="file://$MODULE_DIR$/build" />
++    </content>
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+diff -ruN sf/res/layout/note_edit.xml st/res/layout/note_edit.xml
+--- sf/res/layout/note_edit.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/res/layout/note_edit.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -0,0 +1,124 @@
++<?xml version="1.0" encoding="utf-8"?>
++
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++	android:orientation="vertical" android:layout_width="match_parent"
++	android:layout_height="match_parent">
++
++	<LinearLayout android:orientation="horizontal"
++		android:layout_width="match_parent"
++		android:layout_height="wrap_content">
++
++		<TextView android:layout_width="wrap_content"
++			android:layout_height="wrap_content"
++			android:text="@string/spam_filter_title"
++            android:minWidth="45dp" />
++		<EditText android:id="@+id/title"
++		  android:layout_width="wrap_content"
++			android:layout_height="wrap_content"
++			android:layout_weight="1"/>
++	</LinearLayout>
++    <LinearLayout android:orientation="horizontal"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content">
++
++        <TextView android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="@string/spam_filter_from"
++            android:minWidth="45dp" />
++        <EditText android:id="@+id/from"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_weight="1"/>
++    </LinearLayout>
++    <LinearLayout android:orientation="horizontal"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content">
++
++        <TextView android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="@string/spam_filter_subj"
++            android:minWidth="45dp" />
++        <EditText android:id="@+id/subj"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_weight="1"/>
++    </LinearLayout>
++
++    <LinearLayout android:orientation="horizontal"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content">
++    <CheckBox
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="@string/spam_filter_hide"
++        android:id="@+id/hide"
++        android:layout_gravity="center_horizontal"
++        android:layout_weight="1" />
++
++    <CheckBox
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="@string/spam_filter_del"
++        android:id="@+id/del"
++        android:layout_weight="1" />
++
++    <Button android:id="@+id/confirm"
++        android:text="@string/spam_filter_confirm"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_weight="2" />
++
++        <Button android:id="@+id/cancel"
++            android:text="@string/spam_filter_cancel"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_weight="2" />
++</LinearLayout>
++
++    <LinearLayout
++        android:orientation="vertical"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:gravity="center_vertical"
++        android:layout_weight="3">
++        <Button
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="@string/spam_filter_apply_filter_to_existing_mail"
++            android:id="@+id/apply_filter"
++            android:layout_gravity="center_horizontal"
++            android:gravity="center_vertical" />
++        </LinearLayout>
++
++    <LinearLayout android:orientation="vertical"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_weight="1"
++        android:gravity="center|bottom">
++
++
++
++        <TextView
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="request at Avatar.Blueray@gmail.com"
++            android:id="@+id/textView"
++            android:textSize="20dp"
++            android:textAlignment="center" />
++    </LinearLayout>
++
++    <TextView
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="donation copy BTC wallet to clipboard"
++        android:id="@+id/textView2"
++        android:layout_gravity="center_horizontal"
++        android:textSize="20dp" />
++
++    <Button
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:text="1hRm41a1roEBHS7uxF9auvfekUYHvFctF"
++        android:id="@+id/donate"
++        android:layout_gravity="center_horizontal" />
++</LinearLayout>
+\ No newline at end of file
+diff -ruN sf/res/layout/notes_list.xml st/res/layout/notes_list.xml
+--- sf/res/layout/notes_list.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/res/layout/notes_list.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++      android:layout_width="wrap_content"
++    	android:layout_height="wrap_content">
++    
++    <ListView android:id="@+id/android:list"
++          android:layout_width="wrap_content"
++        	android:layout_height="wrap_content"/>
++  	<TextView android:id="@+id/android:empty"
++          android:layout_width="wrap_content"
++        	android:layout_height="wrap_content"
++        	android:text="@string/spam_filter_no_filter"/>
++</LinearLayout>
+diff -ruN sf/res/layout/notes_row.xml st/res/layout/notes_row.xml
+--- sf/res/layout/notes_row.xml	1970-01-01 03:00:00.000000000 +0300
++++ st/res/layout/notes_row.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<TextView android:id="@+id/text1" xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="wrap_content"
++    android:layout_height="wrap_content"
++    android:textSize="20dp"
++    android:minHeight="25dp" />
+diff -ruN sf/res/menu/accounts_option.xml st/res/menu/accounts_option.xml
+--- sf/res/menu/accounts_option.xml	2015-06-09 15:37:32.000000000 +0300
++++ st/res/menu/accounts_option.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -28,6 +28,10 @@
+         android:icon="?attr/iconActionAbout"
+         android:title="@string/about_action"/>
+     <item
++        android:id="@+id/spamfilter"
++        android:icon="?attr/iconActionAbout"
++        android:title="@string/spam_filter_action"/>
++    <item
+         android:id="@+id/import_export"
+         android:icon="?attr/iconActionImportExport"
+         android:title="@string/import_export_action">
+diff -ruN sf/res/menu/message_list_item_context.xml st/res/menu/message_list_item_context.xml
+--- sf/res/menu/message_list_item_context.xml	2015-06-09 15:37:32.000000000 +0300
++++ st/res/menu/message_list_item_context.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -9,8 +9,14 @@
+          android:id="@+id/reply_all"
+          android:title="@string/reply_all_action"/>
+      <item
+-         android:id="@+id/reply"
+-         android:title="@string/reply_action"/>
++    android:id="@+id/reply"
++    android:title="@string/reply_action"/>
++    <item
++        android:id="@+id/configure_spam_filter_from_source"
++        android:title="@string/spam_filter_configure_spam_filter_from_source"/>
++    <item
++        android:id="@+id/to_spam_from_this_domain"
++        android:title="@string/spam_filter_to_spam_from_this_domain"/>
+      <item
+          android:id="@+id/send_again"
+          android:title="@string/send_again_action"/>
+diff -ruN sf/res/menu/message_list_option.xml st/res/menu/message_list_option.xml
+--- sf/res/menu/message_list_option.xml	2015-06-09 15:37:32.000000000 +0300
++++ st/res/menu/message_list_option.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -226,6 +226,11 @@
+         android:id="@+id/show_folder_list"
+         android:showAsAction="never"
+         android:title="@string/folders_title" />
++    <item
++        android:id="@+id/configure_spam_filter"
++        android:showAsAction="never"
++        android:title="@string/spam_filter_action" />
++
+     <!-- always -->
+     <item
+         android:id="@+id/settings"
+diff -ruN sf/res/values/arrays.xml st/res/values/arrays.xml
+--- sf/res/values/arrays.xml	2015-06-09 15:37:32.000000000 +0300
++++ st/res/values/arrays.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -19,6 +19,9 @@
+     <string-array name="account_settings_check_frequency_entries">
+         <item>@string/account_setup_options_mail_check_frequency_never</item>
+         <item>@string/account_setup_options_mail_check_frequency_1min</item>
++        <item>@string/account_setup_options_mail_check_frequency_2min</item>
++        <item>@string/account_setup_options_mail_check_frequency_3min</item>
++        <item>@string/account_setup_options_mail_check_frequency_4min</item>
+         <item>@string/account_setup_options_mail_check_frequency_5min</item>
+         <item>@string/account_setup_options_mail_check_frequency_10min</item>
+         <item>@string/account_setup_options_mail_check_frequency_15min</item>
+@@ -34,6 +37,9 @@
+     <string-array name="account_settings_check_frequency_values" translatable="false">
+         <item>-1</item>
+         <item>1</item>
++        <item>2</item>
++        <item>3</item>
++        <item>4</item>
+         <item>5</item>
+         <item>10</item>
+         <item>15</item>
+diff -ruN sf/res/values/strings.xml st/res/values/strings.xml
+--- sf/res/values/strings.xml	2015-06-09 15:37:32.000000000 +0300
++++ st/res/values/strings.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -344,6 +344,8 @@
+ 
+     <string name="quiet_time">Quiet Time</string>
+     <string name="quiet_time_description">Disable ringing, buzzing and flashing at night</string>
++    <string name="notify_spam_anywere">Уведомдения о спаме</string>
++    <string name="notify_spam_anywere_description">Показывать уведомления о спаме всегда</string>
+     <string name="quiet_time_starts">Quiet Time starts</string>
+     <string name="quiet_time_ends">Quiet Time ends</string>
+ 
+@@ -452,6 +454,9 @@
+     <string name="account_setup_options_mail_check_frequency_label">Folder poll frequency</string>
+     <string name="account_setup_options_mail_check_frequency_never">Never</string>
+     <string name="account_setup_options_mail_check_frequency_1min">Every minute</string>
++    <string name="account_setup_options_mail_check_frequency_2min">Every 2 minutes</string>
++    <string name="account_setup_options_mail_check_frequency_3min">Every 3 minutes</string>
++    <string name="account_setup_options_mail_check_frequency_4min">Every 4 minutes</string>
+     <string name="account_setup_options_mail_check_frequency_5min">Every 5 minutes</string>
+     <string name="account_setup_options_mail_check_frequency_10min">Every 10 minutes</string>
+     <string name="account_setup_options_mail_check_frequency_15min">Every 15 minutes</string>
+@@ -1130,4 +1135,24 @@
+     <string name="client_certificate_retrieval_failure">"Failed to retrieve client certificate for alias \"<xliff:g id="alias">%s</xliff:g>\""</string>
+     <string name="client_certificate_advanced_options">Advanced options</string>
+     <string name="client_certificate_expired">"Client certificate \"<xliff:g id="certificate_alias">%1$s</xliff:g>\" has expired or is not yet valid (<xliff:g id="exception_message">%2$s</xliff:g>)"</string>
++
++    <!-- Spam Filter-->
++    <string name="spam_filter_app_name">Spam Filter</string>
++    <string name="spam_filter_no_filter">No Filters Yet</string>
++    <string name="spam_filter_menu_insert">Add Filter</string>
++    <string name="spam_filter_menu_delete">Delete Filter</string>
++    <string name="spam_filter_title">Title</string>
++    <string name="spam_filter_from">From</string>
++    <string name="spam_filter_subj">Subj</string>
++    <string name="spam_filter_hide">Hide</string>
++    <string name="spam_filter_del">Del</string>
++    <string name="spam_filter_confirm">Confirm</string>
++    <string name="spam_filter_edit_filter">Edit Filter</string>
++    <string name="spam_filter_action">Configure Spam Filter</string>
++    <string name="spam_filter_apply_filter_to_existing_mail">Apply filter to existing mail</string>
++    <string name="spam_filter_cancel">Cancel</string>
++    <string name="spam_filter_configure_spam_filter_from_source">Configure Spam Filter From Mail</string>
++    <string name="spam_filter_to_spam_from_this_domain">To spam from this domain</string>
++    <string name="spam_filter_request">Request at Avatar.Blueray@gmail.com
++    donation BTC copy wallet to clipboard</string>
+ </resources>
+diff -ruN sf/res/values-ru/strings.xml st/res/values-ru/strings.xml
+--- sf/res/values-ru/strings.xml	2015-06-09 15:37:32.000000000 +0300
++++ st/res/values-ru/strings.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -370,6 +370,9 @@
+   <string name="account_setup_options_mail_check_frequency_label">Интервал проверки</string>
+   <string name="account_setup_options_mail_check_frequency_never">Вручную</string>
+   <string name="account_setup_options_mail_check_frequency_1min">1 минута</string>
++    <string name="account_setup_options_mail_check_frequency_2min">2 минуты</string>
++    <string name="account_setup_options_mail_check_frequency_3min">3 минуты</string>
++    <string name="account_setup_options_mail_check_frequency_4min">4 минуты</string>
+   <string name="account_setup_options_mail_check_frequency_5min">5 минут</string>
+   <string name="account_setup_options_mail_check_frequency_10min">10 минут</string>
+   <string name="account_setup_options_mail_check_frequency_15min">15 минут</string>
+diff -ruN sf/res/xml/global_preferences.xml st/res/xml/global_preferences.xml
+--- sf/res/xml/global_preferences.xml	2015-06-09 15:37:32.000000000 +0300
++++ st/res/xml/global_preferences.xml	2015-06-20 23:29:58.000000000 +0300
+@@ -327,6 +327,12 @@
+             android:dialogTitle="@string/global_settings_notification_quick_delete_title"
+             android:summary="@string/global_settings_notification_quick_delete_description"
+             />
++        <CheckBoxPreference
++            android:key="notify_spam_anywere"
++            android:persistent="false"
++            android:title="@string/notify_spam_anywere"
++            android:summary="@string/notify_spam_anywere_description"
++            />
+ 
+     </PreferenceScreen>
+ 
+diff -ruN sf/settings.gradle st/settings.gradle
+--- sf/settings.gradle	2015-06-09 15:37:32.000000000 +0300
++++ st/settings.gradle	2015-06-23 14:58:48.000000000 +0300
+@@ -1,4 +1,6 @@
+-include ':plugins:Android-PullToRefresh:library'
++include ':plugins:Android-PullToRefresh:library', ':'
+ include ':plugins:ckChangeLog:library'
+ include ':plugins:HoloColorPicker'
+ include ':plugins:openpgp-api-library'
++
++include ':MultiFileSelector'
+diff -ruN sf/src/com/fsck/k9/activity/Accounts.java st/src/com/fsck/k9/activity/Accounts.java
+--- sf/src/com/fsck/k9/activity/Accounts.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/activity/Accounts.java	2015-06-20 23:29:58.000000000 +0300
+@@ -95,6 +95,8 @@
+ import com.fsck.k9.search.SearchSpecification.Searchfield;
+ import com.fsck.k9.view.ColorChip;
+ 
++import com.fsck.k9.spam_filter.*;
++
+ import de.cketti.library.changelog.ChangeLog;
+ 
+ 
+@@ -1262,6 +1264,9 @@
+         case R.id.about:
+             onAbout();
+             break;
++        case R.id.spamfilter:
++            onSpamfilter();
++            break;
+         case R.id.search:
+             onSearchRequested();
+             break;
+@@ -1288,6 +1293,11 @@
+         new String[] {"HoloColorPicker", "https://github.com/LarsWerkman/HoloColorPicker"}
+     };
+ 
++    private void onSpamfilter() {
++        Intent i = new Intent(this, com.fsck.k9.spam_filter.Notepadv3.class);
++        startActivityForResult(i, 0);
++    }
++
+     private void onAbout() {
+         String appName = getString(R.string.app_name);
+         int year = Calendar.getInstance().get(Calendar.YEAR);
+diff -ruN sf/src/com/fsck/k9/activity/MessageCompose.java st/src/com/fsck/k9/activity/MessageCompose.java
+--- sf/src/com/fsck/k9/activity/MessageCompose.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/activity/MessageCompose.java	2015-06-23 18:05:26.000000000 +0300
+@@ -3,6 +3,7 @@
+ 
+ import java.io.ByteArrayInputStream;
+ import java.io.ByteArrayOutputStream;
++import java.io.File;
+ import java.io.InputStream;
+ import java.io.UnsupportedEncodingException;
+ import java.text.DateFormat;
+@@ -122,6 +123,8 @@
+ import org.openintents.openpgp.util.OpenPgpApi;
+ import org.openintents.openpgp.util.OpenPgpServiceConnection;
+ 
++ import paul.arian.fileselector.FileSelectionActivity;
++
+ public class MessageCompose extends K9Activity implements OnClickListener,
+         ProgressDialogFragment.CancelListener {
+ 
+@@ -183,6 +186,7 @@
+     private static final int MSG_PERFORM_STALLED_ACTION = 6;
+ 
+     private static final int ACTIVITY_REQUEST_PICK_ATTACHMENT = 1;
++    private static final int ACTIVITY_REQUEST_PICK_ATTACHMENT_MULTIPLY = 44;
+     private static final int CONTACT_PICKER_TO = 4;
+     private static final int CONTACT_PICKER_CC = 5;
+     private static final int CONTACT_PICKER_BCC = 6;
+@@ -2056,12 +2060,16 @@
+         if (mAccount.getCryptoProvider().isAvailable(this) || mAccount.getOpenPgpProvider() != null) {
+             Toast.makeText(this, R.string.attachment_encryption_unsupported, Toast.LENGTH_LONG).show();
+         }
+-        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
++      /*  Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+         i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+         i.addCategory(Intent.CATEGORY_OPENABLE);
+         i.setType(mime_type);
+         mIgnoreOnPause = true;
+         startActivityForResult(Intent.createChooser(i, null), ACTIVITY_REQUEST_PICK_ATTACHMENT);
++        */
++        Intent intent = new Intent(getBaseContext(), FileSelectionActivity.class);
++        startActivityForResult(intent, ACTIVITY_REQUEST_PICK_ATTACHMENT_MULTIPLY);
++
+     }
+ 
+     private void addAttachment(Uri uri) {
+@@ -2239,6 +2247,7 @@
+         // if a CryptoSystem activity is returning, then mPreventDraftSaving was set to true
+         mPreventDraftSaving = false;
+ 
++
+         // OpenPGP: try again after user interaction
+         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SIGN_ENCRYPT) {
+             /*
+@@ -2267,6 +2276,22 @@
+                 addAttachmentsFromResultIntent(data);
+                 mDraftNeedsSaving = true;
+                 break;
++            case ACTIVITY_REQUEST_PICK_ATTACHMENT_MULTIPLY:
++
++                if( resultCode == RESULT_OK){
++
++                    ArrayList<File> Files = (ArrayList<File>) data.getSerializableExtra(FileSelectionActivity.FILES_TO_UPLOAD); //file array list
++                    String [] files_paths; //string array
++
++
++                    for(File file : Files){
++                        //String fileName = file.getName();
++
++                        addAttachment(android.net.Uri.parse(file.toURI().toString()));
++                    }
++                }
++                mDraftNeedsSaving = true;
++                break;
+             case CONTACT_PICKER_TO:
+             case CONTACT_PICKER_CC:
+             case CONTACT_PICKER_BCC:
+@@ -2333,6 +2358,7 @@
+                 for (int i = 0, end = clipData.getItemCount(); i < end; i++) {
+                     Uri uri = clipData.getItemAt(i).getUri();
+                     if (uri != null) {
++
+                         addAttachment(uri);
+                     }
+                 }
+@@ -2342,6 +2368,7 @@
+ 
+         Uri uri = data.getData();
+         if (uri != null) {
++
+             addAttachment(uri);
+         }
+     }
+@@ -2590,9 +2617,11 @@
+     }
+ 
+     private void showWaitingForAttachmentDialog() {
+-        String title;
++        String title = "";
+ 
+         switch (mWaitingForAttachments) {
++            case NONE:
++                break;
+             case SEND: {
+                 title = getString(R.string.fetching_attachment_dialog_title_send);
+                 break;
+diff -ruN sf/src/com/fsck/k9/activity/MessageList.java st/src/com/fsck/k9/activity/MessageList.java
+--- sf/src/com/fsck/k9/activity/MessageList.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/activity/MessageList.java	2015-06-20 23:29:58.000000000 +0300
+@@ -747,6 +747,11 @@
+         Prefs.actionPrefs(this);
+     }
+ 
++    private void onSpamfilter() {
++        Intent i = new Intent(this, com.fsck.k9.spam_filter.Notepadv3.class);
++        startActivityForResult(i, 0);
++    }
++
+     private void onEditAccount() {
+         AccountSettings.actionSettings(this, mAccount);
+     }
+@@ -809,6 +814,10 @@
+                 mMessageListFragment.selectAll();
+                 return true;
+             }
++            case R.id.configure_spam_filter: {
++                onSpamfilter();
++                return true;
++            }
+             case R.id.app_settings: {
+                 onEditPrefs();
+                 return true;
+@@ -850,6 +859,11 @@
+                 mMessageViewFragment.onReply();
+                 return true;
+             }
++            /*case R.id.configure_spam_filter_from_source: {
++
++                Log.e(K9.LOG_TAG, "configure_spam_filter_from_source");
++                return true;
++            }*/
+             case R.id.reply_all: {
+                 mMessageViewFragment.onReplyAll();
+                 return true;
+diff -ruN sf/src/com/fsck/k9/activity/setup/AccountSetupOptions.java st/src/com/fsck/k9/activity/setup/AccountSetupOptions.java
+--- sf/src/com/fsck/k9/activity/setup/AccountSetupOptions.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/activity/setup/AccountSetupOptions.java	2015-06-20 23:29:58.000000000 +0300
+@@ -55,6 +55,12 @@
+             getString(R.string.account_setup_options_mail_check_frequency_never)),
+             new SpinnerOption(1,
+             getString(R.string.account_setup_options_mail_check_frequency_1min)),
++                new SpinnerOption(2,
++                        getString(R.string.account_setup_options_mail_check_frequency_2min)),
++                new SpinnerOption(3,
++                        getString(R.string.account_setup_options_mail_check_frequency_3min)),
++                new SpinnerOption(4,
++                        getString(R.string.account_setup_options_mail_check_frequency_4min)),
+             new SpinnerOption(5,
+             getString(R.string.account_setup_options_mail_check_frequency_5min)),
+             new SpinnerOption(10,
+diff -ruN sf/src/com/fsck/k9/activity/setup/Prefs.java st/src/com/fsck/k9/activity/setup/Prefs.java
+--- sf/src/com/fsck/k9/activity/setup/Prefs.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/activity/setup/Prefs.java	2015-06-20 23:29:58.000000000 +0300
+@@ -79,6 +79,7 @@
+     private static final String PREFERENCE_MESSAGEVIEW_RETURN_TO_LIST = "messageview_return_to_list";
+     private static final String PREFERENCE_MESSAGEVIEW_SHOW_NEXT = "messageview_show_next";
+     private static final String PREFERENCE_QUIET_TIME_ENABLED = "quiet_time_enabled";
++    private static final String PREFERENCE_NOTIFY_SPAM_ANYWERE = "notify_spam_anywere";
+     private static final String PREFERENCE_QUIET_TIME_STARTS = "quiet_time_starts";
+     private static final String PREFERENCE_QUIET_TIME_ENDS = "quiet_time_ends";
+     private static final String PREFERENCE_NOTIF_QUICK_DELETE = "notification_quick_delete";
+@@ -141,6 +142,7 @@
+     private CheckBoxListPreference mVisibleRefileActions;
+ 
+     private CheckBoxPreference mQuietTimeEnabled;
++    private CheckBoxPreference mNotifySpamEnywere;
+     private com.fsck.k9.preferences.TimePickerPreference mQuietTimeStarts;
+     private com.fsck.k9.preferences.TimePickerPreference mQuietTimeEnds;
+     private ListPreference mNotificationQuickDelete;
+@@ -307,6 +309,9 @@
+         mQuietTimeEnabled = (CheckBoxPreference) findPreference(PREFERENCE_QUIET_TIME_ENABLED);
+         mQuietTimeEnabled.setChecked(K9.getQuietTimeEnabled());
+ 
++        mNotifySpamEnywere = (CheckBoxPreference) findPreference(PREFERENCE_NOTIFY_SPAM_ANYWERE);
++        mNotifySpamEnywere.setChecked(K9.getNotifySpamAnywere());
++
+         mQuietTimeStarts = (TimePickerPreference) findPreference(PREFERENCE_QUIET_TIME_STARTS);
+         mQuietTimeStarts.setDefaultValue(K9.getQuietTimeStarts());
+         mQuietTimeStarts.setSummary(K9.getQuietTimeStarts());
+@@ -467,6 +472,7 @@
+         K9.setMessageViewShowNext(mShowNext.isChecked());
+         K9.setAutofitWidth(mAutofitWidth.isChecked());
+         K9.setQuietTimeEnabled(mQuietTimeEnabled.isChecked());
++        K9.setNotifySpamAnywere(mNotifySpamEnywere.isChecked());
+ 
+         boolean[] enabledRefileActions = mVisibleRefileActions.getCheckedItems();
+         K9.setMessageViewDeleteActionVisible(enabledRefileActions[VISIBLE_REFILE_ACTIONS_DELETE]);
+diff -ruN sf/src/com/fsck/k9/controller/MessagingController.java st/src/com/fsck/k9/controller/MessagingController.java
+--- sf/src/com/fsck/k9/controller/MessagingController.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/controller/MessagingController.java	2015-06-20 23:29:58.000000000 +0300
+@@ -95,6 +95,8 @@
+ import com.fsck.k9.search.SqlQueryBuilder;
+ import com.fsck.k9.service.NotificationActionService;
+ 
++import com.fsck.k9.spam_filter.spam_filter_db_helper;
++
+ 
+ /**
+  * Starts a long running (application) Thread that will run through commands
+@@ -1664,7 +1666,7 @@
+                     }
+                     // Send a notification of this message
+ 
+-                    if (shouldNotifyForMessage(account, localFolder, message)) {
++                    if (shouldNotifyForMessage(account, localFolder, message, localMessage)) {
+                         // Notify with the localMessage so that we don't have to recalculate the content preview.
+                         notifyAccount(mApplication, account, localMessage, unreadBeforeStart);
+                     }
+@@ -1802,7 +1804,7 @@
+             }
+ 
+             // Send a notification of this message
+-            if (shouldNotifyForMessage(account, localFolder, message)) {
++            if (shouldNotifyForMessage(account, localFolder, message, localMessage)) {
+                 // Notify with the localMessage so that we don't have to recalculate the content preview.
+                 notifyAccount(mApplication, account, localMessage, unreadBeforeStart);
+             }
+@@ -1850,7 +1852,7 @@
+                         for (MessagingListener l : getListeners()) {
+                             l.synchronizeMailboxAddOrUpdateMessage(account, folder, localMessage);
+                         }
+-                        if (shouldNotifyForMessage(account, localFolder, localMessage)) {
++                        if (shouldNotifyForMessage(account, localFolder, localMessage, localMessage)) {
+                             shouldBeNotifiedOf = true;
+                         }
+                     }
+@@ -4602,14 +4604,51 @@
+         });
+     }
+ 
++    private long checkForSpam(String from, String subj){
++        spam_filter_db_helper db;
++        db = new spam_filter_db_helper( mApplication.getApplicationContext());
++        long ret = db.checkForSpamGetAction(from,subj);
++        db.closeDB();
++
++        return  ret;
++    }
+ 
+-    private boolean shouldNotifyForMessage(Account account, LocalFolder localFolder, Message message) {
++
++    private boolean shouldNotifyForMessage(Account account, LocalFolder localFolder, Message message, Message localmessage) {
+         // If we don't even have an account name, don't show the notification.
+         // (This happens during initial account setup)
+         if (account.getName() == null) {
+             return false;
+         }
+ 
++        String subj = message.getSubject();
++
++       // Log.e(K9.LOG_TAG, "subj is  " + subj);
++
++
++        Address[] address = message.getFrom();
++
++        for (Address adr:address){
++            String from = adr.getAddress();
++
++            // Log.e(K9.LOG_TAG, "subj from  is  " + subj+ "  "+ from);
++
++            long result = checkForSpam(from,subj);
++
++            if (result == spam_filter_db_helper.ACTION_HIDE ){
++                // Log.e(K9.LOG_TAG, "action hide  " );
++                return  false;
++            }
++
++            if (result == spam_filter_db_helper.ACTION_HIDENDEL ){
++                // Log.e(K9.LOG_TAG, "action del  " );
++
++                deleteMessages(Collections.singletonList(localmessage), null);
++                return  false;
++            }
++
++        }
++
+         // Do not notify if the user does not have notifications enabled or if the message has
+         // been read.
+         if (!account.isNotifyNewMail() || message.isSet(Flag.SEEN)) {
+@@ -4646,7 +4685,7 @@
+             if (!account.getInboxFolderName().equals(folderName) &&
+                     (account.getTrashFolderName().equals(folderName)
+                      || account.getDraftsFolderName().equals(folderName)
+-                     || account.getSpamFolderName().equals(folderName)
++                     || ( K9.isNotSpamEnabled() && account.getSpamFolderName().equals(folderName) )
+                      || account.getSentFolderName().equals(folderName))) {
+                 return false;
+             }
+diff -ruN sf/src/com/fsck/k9/fragment/MessageListFragment.java st/src/com/fsck/k9/fragment/MessageListFragment.java
+--- sf/src/com/fsck/k9/fragment/MessageListFragment.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/fragment/MessageListFragment.java	2015-06-20 23:29:58.000000000 +0300
+@@ -100,11 +100,14 @@
+ import com.fsck.k9.search.SearchSpecification.SearchCondition;
+ import com.fsck.k9.search.SearchSpecification.Searchfield;
+ import com.fsck.k9.search.SqlQueryBuilder;
++import com.fsck.k9.spam_filter.NoteEdit;
++import com.fsck.k9.spam_filter.NotesDbAdapter;
+ import com.handmark.pulltorefresh.library.ILoadingLayout;
+ import com.handmark.pulltorefresh.library.PullToRefreshBase;
+ import com.handmark.pulltorefresh.library.PullToRefreshListView;
+ 
+ 
++
+ public class MessageListFragment extends Fragment implements OnItemClickListener,
+         ConfirmationDialogFragmentListener, LoaderCallbacks<Cursor> {
+ 
+@@ -1513,6 +1516,53 @@
+                 onReply(message);
+                 break;
+             }
++            case R.id.configure_spam_filter_from_source: {
++                Message message = getMessageAtPosition(adapterPosition);
++                String subj = message.getSubject();
++                Address[] address = message.getFrom();
++                Address adr_t = null;
++                for (Address adr:address){
++                    adr_t = adr;
++                }
++
++                String from  = "";
++                if ( adr_t != null ) {
++                    from = adr_t.getAddress();
++                }
++
++
++                Intent i = new Intent(mContext, NoteEdit.class);
++                i.putExtra(NotesDbAdapter.KEY_SUBJ, subj);
++                i.putExtra(NotesDbAdapter.KEY_FROM, from);
++                startActivityForResult(i, 1);
++
++                break;
++            }
++
++            case R.id.to_spam_from_this_domain: {
++                Message message = getMessageAtPosition(adapterPosition);
++
++                Address[] address = message.getFrom();
++                Address adr_t = null;
++                for (Address adr:address){
++                    adr_t = adr;
++                }
++
++                String from  = "";
++                if ( adr_t != null ) {
++                    from = ".*@"+adr_t.getAddress().split("@")[1];
++                }
++
++
++                Intent i = new Intent(mContext, NoteEdit.class);
++                i.putExtra(NotesDbAdapter.KEY_SUBJ, "");
++                i.putExtra(NotesDbAdapter.KEY_FROM, from);
++                i.putExtra(NotesDbAdapter.KEY_DEL, true);
++                startActivityForResult(i, 1);
++
++                break;
++            }
++
+             case R.id.reply_all: {
+                 Message message = getMessageAtPosition(adapterPosition);
+                 onReplyAll(message);
+diff -ruN sf/src/com/fsck/k9/K9.java st/src/com/fsck/k9/K9.java
+--- sf/src/com/fsck/k9/K9.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/K9.java	2015-06-20 23:29:58.000000000 +0300
+@@ -255,6 +255,7 @@
+     private static boolean mHideSpecialAccounts = false;
+     private static boolean mAutofitWidth;
+     private static boolean mQuietTimeEnabled = false;
++    private static boolean mNotifySpamEnywere = false;
+     private static String mQuietTimeStarts = null;
+     private static String mQuietTimeEnds = null;
+     private static String mAttachmentDefaultPath = "";
+@@ -510,6 +511,7 @@
+         editor.putBoolean("useVolumeKeysForListNavigation", mUseVolumeKeysForListNavigation);
+         editor.putBoolean("autofitWidth", mAutofitWidth);
+         editor.putBoolean("quietTimeEnabled", mQuietTimeEnabled);
++        editor.putBoolean("notifySpamEnywere", mNotifySpamEnywere);
+         editor.putString("quietTimeStarts", mQuietTimeStarts);
+         editor.putString("quietTimeEnds", mQuietTimeEnds);
+ 
+@@ -726,6 +728,7 @@
+         mAutofitWidth = sprefs.getBoolean("autofitWidth", true);
+ 
+         mQuietTimeEnabled = sprefs.getBoolean("quietTimeEnabled", false);
++        mNotifySpamEnywere = sprefs.getBoolean("notifySpamEnywere", false);
+         mQuietTimeStarts = sprefs.getString("quietTimeStarts", "21:00");
+         mQuietTimeEnds = sprefs.getString("quietTimeEnds", "7:00");
+ 
+@@ -978,11 +981,18 @@
+     public static boolean getQuietTimeEnabled() {
+         return mQuietTimeEnabled;
+     }
++    public static boolean getNotifySpamAnywere() {
++        return mNotifySpamEnywere;
++    }
+ 
+     public static void setQuietTimeEnabled(boolean quietTimeEnabled) {
+         mQuietTimeEnabled = quietTimeEnabled;
+     }
+ 
++    public static void setNotifySpamAnywere(boolean notifySpamEnywere) {
++        mNotifySpamEnywere = notifySpamEnywere;
++    }
++
+     public static String getQuietTimeStarts() {
+         return mQuietTimeStarts;
+     }
+@@ -1000,6 +1010,9 @@
+     }
+ 
+ 
++	public static boolean isNotSpamEnabled(){
++			return !mNotifySpamEnywere;
++	}
+     public static boolean isQuietTime() {
+         if (!mQuietTimeEnabled) {
+             return false;
+diff -ruN sf/src/com/fsck/k9/preferences/GlobalSettings.java st/src/com/fsck/k9/preferences/GlobalSettings.java
+--- sf/src/com/fsck/k9/preferences/GlobalSettings.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/preferences/GlobalSettings.java	2015-06-20 23:29:58.000000000 +0300
+@@ -157,6 +157,9 @@
+         s.put("quietTimeEnabled", Settings.versions(
+                 new V(1, new BooleanSetting(false))
+             ));
++		s.put("notifySpamEnywere", Settings.versions(
++                new V(1, new BooleanSetting(false))
++            ));	
+         s.put("quietTimeEnds", Settings.versions(
+                 new V(1, new TimeSetting("7:00"))
+             ));
+diff -ruN sf/src/com/fsck/k9/remotecontrol/K9RemoteControl.java st/src/com/fsck/k9/remotecontrol/K9RemoteControl.java
+--- sf/src/com/fsck/k9/remotecontrol/K9RemoteControl.java	2015-06-09 15:37:32.000000000 +0300
++++ st/src/com/fsck/k9/remotecontrol/K9RemoteControl.java	2015-06-20 23:29:58.000000000 +0300
+@@ -90,7 +90,7 @@
+      */
+     public final static String K9_POLL_CLASSES = "com.fsck.k9.K9RemoteControl.pollClasses";
+ 
+-    public final static String[] K9_POLL_FREQUENCIES = { "-1", "1", "5", "10", "15", "30", "60", "120", "180", "360", "720", "1440"};
++    public final static String[] K9_POLL_FREQUENCIES = { "-1", "1", "2", "3", "4", "5", "10", "15", "30", "60", "120", "180", "360", "720", "1440"};
+     /**
+      * Key for the {@link Intent} Extra to set with the desired poll frequency.  The value is a String representing a number of minutes.
+      * Acceptable values are available in K9_POLL_FREQUENCIES
+diff -ruN sf/src/com/fsck/k9/spam_filter/NoteEdit.java st/src/com/fsck/k9/spam_filter/NoteEdit.java
+--- sf/src/com/fsck/k9/spam_filter/NoteEdit.java	1970-01-01 03:00:00.000000000 +0300
++++ st/src/com/fsck/k9/spam_filter/NoteEdit.java	2015-06-20 23:29:58.000000000 +0300
+@@ -0,0 +1,291 @@
++/*
++ * Copyright (C) 2008 Google Inc.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.fsck.k9.spam_filter;
++
++import android.app.Activity;
++import android.content.ClipData;
++import android.content.Context;
++import android.database.Cursor;
++import android.os.Bundle;
++import android.util.Log;
++import android.view.View;
++import android.widget.Button;
++import android.widget.CheckBox;
++import android.widget.EditText;
++
++import com.fsck.k9.Account;
++import com.fsck.k9.K9;
++import com.fsck.k9.Preferences;
++import com.fsck.k9.R;
++import com.fsck.k9.controller.MessageRetrievalListener;
++import com.fsck.k9.controller.MessagingController;
++import com.fsck.k9.mail.Address;
++import com.fsck.k9.mail.Message;
++import com.fsck.k9.mail.store.LocalStore;
++import com.fsck.k9.mail.store.LocalStore.LocalMessage;
++import com.fsck.k9.search.LocalSearch;
++
++import java.util.Collections;
++import java.util.List;
++
++public class NoteEdit extends Activity {
++
++    private EditText mTitleText;
++    private EditText mFromText;
++    private EditText mSubjText;
++    private CheckBox mHideCb;
++    private CheckBox mDelCb;
++    private Long mRowId;
++    private NotesDbAdapter mDbHelper;
++
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        createHelper();
++
++        setContentView(R.layout.note_edit);
++        setTitle(R.string.spam_filter_edit_filter);
++
++        mTitleText = (EditText) findViewById(R.id.title);
++        mFromText = (EditText) findViewById(R.id.from);
++        mSubjText = (EditText) findViewById(R.id.subj);
++
++        mHideCb = (CheckBox) findViewById(R.id.hide);
++        mDelCb = (CheckBox) findViewById(R.id.del);
++
++
++        Button confirmButton = (Button) findViewById(R.id.confirm);
++        Button donteButton = (Button) findViewById(R.id.donate);
++        Button applyfilterButton = (Button) findViewById(R.id.apply_filter);
++        Button cancelButton = (Button) findViewById(R.id.cancel);
++
++
++        mRowId = (savedInstanceState == null) ? null :
++            (Long) savedInstanceState.getSerializable(NotesDbAdapter.KEY_ROWID);
++		if (mRowId == null) {
++			Bundle extras = getIntent().getExtras();
++			mRowId = extras != null ? extras.getLong(NotesDbAdapter.KEY_ROWID)
++									: null;
++
++
++            mTitleText.setText(extras != null ? extras.getString(NotesDbAdapter.KEY_FROM,""): "");
++            mFromText.setText(extras != null ? extras.getString(NotesDbAdapter.KEY_FROM,""): "");
++            mSubjText.setText(extras != null ? extras.getString(NotesDbAdapter.KEY_SUBJ,""): "");
++            mDelCb.setChecked(extras != null && extras.getBoolean(NotesDbAdapter.KEY_DEL,false));
++		}
++
++
++        if (mRowId != null){
++            if (mRowId == 0){
++                mRowId = null;
++            }
++        }
++
++		populateFields();
++
++        confirmButton.setOnClickListener(new View.OnClickListener() {
++
++            public void onClick(View view) {
++                setResult(RESULT_OK);
++                finish();
++            }
++
++        });
++
++        cancelButton.setOnClickListener(new View.OnClickListener() {
++
++            public void onClick(View view) {
++                mTitleText.setText( "");
++                mFromText.setText( "");
++                mSubjText.setText("");
++                mDelCb.setChecked(false);
++                setResult(RESULT_OK);
++                finish();
++            }
++
++        });
++
++        applyfilterButton.setOnClickListener(new View.OnClickListener() {
++
++            public void onClick(View view) {
++                applyfilter();
++            }
++
++        });
++
++        donteButton.setOnClickListener(new View.OnClickListener() {
++
++            public void onClick(View view) {
++                android.content.ClipboardManager clipboardManager =
++                        (android.content.ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
++                ClipData clip = ClipData.newPlainText("donate for k9-mail spam filter edition", "1hRm41a1roEBHS7uxF9auvfekUYHvFctF");
++                clipboardManager.setPrimaryClip(clip);
++            }
++
++        });
++    }
++
++    private void applyfilter(){
++
++        if (!mDelCb.isChecked())
++            return;
++
++        final String from_t = mFromText.getText().toString();
++        final String subj_t = mSubjText.getText().toString();
++
++         final MessagingController controller = MessagingController.getInstance(getApplication());
++
++
++
++        Account[] accounts = Preferences.getPreferences(getApplicationContext()).getAccounts();
++        for (final Account account : accounts) {
++            // Collecting statistics of the search result
++
++            MessageRetrievalListener retrievalListener = new MessageRetrievalListener() {
++
++
++                @Override
++                public void messageStarted(String uid, int number, int ofTotal) {
++
++                }
++
++                @Override
++                public void messageFinished(Message message, int number, int ofTotal) {
++                    String subj = message.getSubject();
++                    Address[] address = message.getFrom();
++                    String from = "";
++                    for (Address adr : address) {
++                        from = adr.getAddress();
++                    }
++                    boolean delete = false;
++
++                    if (!from_t.isEmpty() && from.matches(from_t)) {
++
++                        if (!subj_t.isEmpty()) {
++                            if (subj.matches(subj_t)) {
++                                delete = true;
++                            }
++                        } else {
++                            delete = true;
++                        }
++
++                    } else {
++                        if (!subj_t.isEmpty() && subj.matches(subj_t))
++                            delete = true;
++                    }
++
++
++                    if (delete) {
++                      //  Log.e(K9.LOG_TAG, "delete  " + message.getSubject());
++                        controller.deleteMessages(Collections.singletonList(message), null);
++                    }
++
++                }
++
++                @Override
++                public void messagesFinished(int total) {
++
++                }
++            };
++
++
++            // build and do the query in the localstore
++            try {
++                LocalStore localStore = account.getLocalStore();
++                LocalSearch tmpSearch = new LocalSearch();
++                localStore.searchForMessages(retrievalListener, tmpSearch);
++            } catch (Exception e) {
++                Log.e(K9.LOG_TAG, "some happins  " + e.toString());
++
++            }
++        }
++
++
++    }
++
++    private void createHelper(){
++        if (mDbHelper == null){
++            mDbHelper = new NotesDbAdapter(this);
++            mDbHelper.open();
++        }
++    }
++
++    private void populateFields() {
++        if (mRowId != null ) {
++            Cursor note = mDbHelper.fetchNote(mRowId);
++            startManagingCursor(note);
++            mTitleText.setText(note.getString(
++                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
++
++            mFromText.setText(note.getString(
++                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_FROM)));
++            mSubjText.setText(note.getString(
++                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_SUBJ)));
++
++
++
++            mHideCb.setChecked(note.getInt(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_HIDE)) != 0);
++            mDelCb.setChecked(note.getInt(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DEL)) != 0);
++        }
++    }
++
++    @Override
++    protected void onSaveInstanceState(Bundle outState) {
++        super.onSaveInstanceState(outState);
++        saveState();
++        outState.putSerializable(NotesDbAdapter.KEY_ROWID, mRowId);
++    }
++
++    @Override
++    protected void onPause() {
++        super.onPause();
++        saveState();
++    }
++
++    @Override
++    protected void onResume() {
++        super.onResume();
++        createHelper();
++
++
++        populateFields();
++    }
++
++    private void saveState() {
++        String title = mTitleText.getText().toString();
++
++        String from = mFromText.getText().toString();
++        String subj = mSubjText.getText().toString();
++
++        long hide = mHideCb.isChecked()? 1:0;
++        long del = mDelCb.isChecked()? 1:0;
++
++        if (mRowId == null) {
++            long id = mDbHelper.createNote(title,from,subj,hide,del);
++            if (id > 0) {
++                mRowId = id;
++            }
++        } else {
++            mDbHelper.updateNote(mRowId, title,from,subj,hide,del);
++        }
++
++        mDbHelper.close();
++        mDbHelper = null;
++
++    }
++
++}
+diff -ruN sf/src/com/fsck/k9/spam_filter/Notepadv3.java st/src/com/fsck/k9/spam_filter/Notepadv3.java
+--- sf/src/com/fsck/k9/spam_filter/Notepadv3.java	1970-01-01 03:00:00.000000000 +0300
++++ st/src/com/fsck/k9/spam_filter/Notepadv3.java	2015-06-20 23:29:58.000000000 +0300
+@@ -0,0 +1,153 @@
++/*
++ * Copyright (C) 2008 Google Inc.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.fsck.k9.spam_filter;
++
++import android.app.ListActivity;
++import android.content.Intent;
++import android.database.Cursor;
++import android.os.Bundle;
++
++import android.view.ContextMenu;
++import android.view.ContextMenu.ContextMenuInfo;
++import android.view.Menu;
++import android.view.MenuItem;
++import android.view.View;
++import android.widget.AdapterView.AdapterContextMenuInfo;
++import android.widget.ListView;
++import android.widget.SimpleCursorAdapter;
++
++import com.fsck.k9.K9;
++import com.fsck.k9.R;
++
++public class Notepadv3 extends ListActivity {
++    private static final int ACTIVITY_CREATE=0;
++    private static final int ACTIVITY_EDIT=1;
++
++    private static final int INSERT_ID = Menu.FIRST;
++    private static final int DELETE_ID = Menu.FIRST + 1;
++
++    private NotesDbAdapter mDbHelper;
++
++    private void createHelper(){
++        if (mDbHelper == null){
++            mDbHelper = new NotesDbAdapter(this);
++            mDbHelper.open();
++        }
++    }
++
++    /** Called when the activity is first created. */
++    @Override
++    public void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.notes_list);
++        createHelper();
++        fillData();
++        registerForContextMenu(getListView());
++    }
++
++    @Override
++    public void onPause() {
++        super.onPause();  // Always call the superclass method first
++
++    }
++
++    @Override
++    protected void onResume() {
++        super.onResume();
++
++        createHelper();
++
++    }
++
++    @Override
++    public void onStop() {
++        super.onStop();  // Always call the superclass method first
++    }
++
++    private void fillData() {
++        Cursor notesCursor = mDbHelper.fetchAllNotes();
++        startManagingCursor(notesCursor);
++
++        // Create an array to specify the fields we want to display in the list (only TITLE)
++        String[] from = new String[]{NotesDbAdapter.KEY_TITLE};
++
++        // and an array of the fields we want to bind those fields to (in this case just text1)
++        int[] to = new int[]{R.id.text1};
++
++        // Now create a simple cursor adapter and set it to display
++        SimpleCursorAdapter notes =
++            new SimpleCursorAdapter(this, R.layout.notes_row, notesCursor, from, to);
++        setListAdapter(notes);
++    }
++
++    @Override
++    public boolean onCreateOptionsMenu(Menu menu) {
++        super.onCreateOptionsMenu(menu);
++        menu.add(0, INSERT_ID, 0, R.string.spam_filter_menu_insert);
++        return true;
++    }
++
++    @Override
++    public boolean onMenuItemSelected(int featureId, MenuItem item) {
++        switch(item.getItemId()) {
++            case INSERT_ID:
++                createNote();
++                return true;
++        }
++
++        return super.onMenuItemSelected(featureId, item);
++    }
++
++    @Override
++    public void onCreateContextMenu(ContextMenu menu, View v,
++            ContextMenuInfo menuInfo) {
++        super.onCreateContextMenu(menu, v, menuInfo);
++        menu.add(0, DELETE_ID, 0, R.string.spam_filter_menu_delete);
++    }
++
++    @Override
++    public boolean onContextItemSelected(MenuItem item) {
++        switch(item.getItemId()) {
++            case DELETE_ID:
++                AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
++                mDbHelper.deleteNote(info.id);
++                fillData();
++                return true;
++        }
++        return super.onContextItemSelected(item);
++    }
++
++    private void createNote() {
++        Intent i = new Intent(this, NoteEdit.class);
++        startActivityForResult(i, ACTIVITY_CREATE);
++    }
++
++    @Override
++    protected void onListItemClick(ListView l, View v, int position, long id) {
++        super.onListItemClick(l, v, position, id);
++        Intent i = new Intent(this, NoteEdit.class);
++        i.putExtra(NotesDbAdapter.KEY_ROWID, id);
++        startActivityForResult(i, ACTIVITY_EDIT);
++    }
++
++    @Override
++    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
++        super.onActivityResult(requestCode, resultCode, intent);
++        createHelper();
++        fillData();
++    }
++}
+diff -ruN sf/src/com/fsck/k9/spam_filter/NotesDbAdapter.java st/src/com/fsck/k9/spam_filter/NotesDbAdapter.java
+--- sf/src/com/fsck/k9/spam_filter/NotesDbAdapter.java	1970-01-01 03:00:00.000000000 +0300
++++ st/src/com/fsck/k9/spam_filter/NotesDbAdapter.java	2015-06-20 23:29:58.000000000 +0300
+@@ -0,0 +1,209 @@
++/*
++ * Copyright (C) 2008 Google Inc.
++ * 
++ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
++ * use this file except in compliance with the License. You may obtain a copy of
++ * the License at
++ * 
++ * http://www.apache.org/licenses/LICENSE-2.0
++ * 
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
++ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
++ * License for the specific language governing permissions and limitations under
++ * the License.
++ */
++
++package com.fsck.k9.spam_filter;
++
++import android.content.ContentValues;
++import android.content.Context;
++import android.database.Cursor;
++import android.database.SQLException;
++import android.database.sqlite.SQLiteDatabase;
++import android.database.sqlite.SQLiteOpenHelper;
++import android.util.Log;
++
++
++/**
++ * Simple notes database access helper class. Defines the basic CRUD operations
++ * for the notepad example, and gives the ability to list all notes as well as
++ * retrieve or modify a specific note.
++ * 
++ * This has been improved from the first version of this tutorial through the
++ * addition of better error handling and also using returning a Cursor instead
++ * of using a collection of inner classes (which is less scalable and not
++ * recommended).
++ */
++public class NotesDbAdapter {
++
++    public static final String KEY_TITLE = "title";
++
++    public static final String KEY_FROM = "from1";
++    public static final String KEY_SUBJ = "subj";
++    public static final String KEY_HIDE = "_hide";
++    public static final String KEY_DEL = "_del";
++    public static final String KEY_ROWID = "_id";
++
++
++    private static final String TAG = "NotesDbAdapter";
++    private DatabaseHelper mDbHelper;
++    private SQLiteDatabase mDb;
++
++
++
++    /**
++     * Database creation sql statement
++     */
++    private static final String DATABASE_CREATE =
++        "create table notes (_id integer primary key autoincrement, "
++        + "title text not null,"
++        + " from1 text not null, subj text not null, _hide integer, _del integer    );";
++
++    private static final String DATABASE_NAME = "data";
++    private static final String DATABASE_TABLE = "notes";
++    private static final int DATABASE_VERSION = 4;
++
++    private final Context mCtx;
++
++    private static class DatabaseHelper extends SQLiteOpenHelper {
++
++        DatabaseHelper(Context context) {
++            super(context, DATABASE_NAME, null, DATABASE_VERSION);
++        }
++
++        @Override
++        public void onCreate(SQLiteDatabase db) {
++
++            db.execSQL(DATABASE_CREATE);
++        }
++
++        @Override
++        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
++            Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
++                    + newVersion + ", which will destroy all old data");
++            db.execSQL("DROP TABLE IF EXISTS notes");
++            onCreate(db);
++        }
++    }
++
++    /**
++     * Constructor - takes the context to allow the database to be
++     * opened/created
++     * 
++     * @param ctx the Context within which to work
++     */
++    public NotesDbAdapter(Context ctx) {
++        this.mCtx = ctx;
++    }
++
++    /**
++     * Open the notes database. If it cannot be opened, try to create a new
++     * instance of the database. If it cannot be created, throw an exception to
++     * signal the failure
++     * 
++     * @return this (self reference, allowing this to be chained in an
++     *         initialization call)
++     * @throws android.database.SQLException if the database could be neither opened or created
++     */
++    public NotesDbAdapter open() throws SQLException {
++        mDbHelper = new DatabaseHelper(mCtx);
++        mDb = mDbHelper.getWritableDatabase();
++        return this;
++    }
++
++
++
++
++    public void close() {
++        mDbHelper.close();
++    }
++
++
++    /**
++     * Create a new note using the title and body provided. If the note is
++     * successfully created return the new rowId for that note, otherwise return
++     * a -1 to indicate failure.
++     *
++     * @param title the title of the note
++     * @return rowId or -1 if failed
++     */
++    public long createNote(String title,  String from, String subj, long hide, long del) {
++        ContentValues initialValues = new ContentValues();
++        initialValues.put(KEY_TITLE, title);
++
++        initialValues.put(KEY_FROM, from);
++        initialValues.put(KEY_SUBJ, subj);
++        initialValues.put(KEY_HIDE, hide);
++        initialValues.put(KEY_DEL, del);
++
++        return mDb.insert(DATABASE_TABLE, null, initialValues);
++    }
++
++    /**
++     * Delete the note with the given rowId
++     *
++     * @param rowId id of note to delete
++     * @return true if deleted, false otherwise
++     */
++    public boolean deleteNote(long rowId) {
++
++        return mDb.delete(DATABASE_TABLE, KEY_ROWID + "=" + rowId, null) > 0;
++    }
++
++    /**
++     * Return a Cursor over the list of all notes in the database
++     *
++     * @return Cursor over all notes
++     */
++    public Cursor fetchAllNotes() {
++
++        mDb.delete(DATABASE_TABLE, KEY_TITLE + " = ?",
++                new String[] {"" });
++
++        return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, KEY_TITLE,
++                 KEY_FROM, KEY_SUBJ, KEY_HIDE, KEY_DEL}, null, null, null, null, null);
++
++    }
++
++    /**
++     * Return a Cursor positioned at the note that matches the given rowId
++     *
++     * @param rowId id of note to retrieve
++     * @return Cursor positioned to matching note, if found
++     * @throws android.database.SQLException if note could not be found/retrieved
++     */
++    public Cursor fetchNote(long rowId) throws SQLException {
++
++        Cursor mCursor =
++
++            mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
++                    KEY_TITLE, KEY_FROM, KEY_SUBJ, KEY_HIDE, KEY_DEL}, KEY_ROWID + "=" + rowId, null,
++                    null, null, null, null);
++        if (mCursor != null) {
++            mCursor.moveToFirst();
++        }
++        return mCursor;
++
++    }
++
++    /**
++     * Update the note using the details provided. The note to be updated is
++     * specified using the rowId, and it is altered to use the title and body
++     * values passed in
++     * 
++     * @param rowId id of note to update
++     * @param title value to set note title to
++     * @return true if the note was successfully updated, false otherwise
++     */
++    public boolean updateNote(long rowId, String title,  String from, String subj, long hide, long del) {
++        ContentValues args = new ContentValues();
++        args.put(KEY_TITLE, title);
++        args.put(KEY_FROM, from);
++        args.put(KEY_SUBJ, subj);
++        args.put(KEY_HIDE, hide);
++        args.put(KEY_DEL, del);
++
++        return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
++    }
++}
+diff -ruN sf/src/com/fsck/k9/spam_filter/spam_filter_db_helper.java st/src/com/fsck/k9/spam_filter/spam_filter_db_helper.java
+--- sf/src/com/fsck/k9/spam_filter/spam_filter_db_helper.java	1970-01-01 03:00:00.000000000 +0300
++++ st/src/com/fsck/k9/spam_filter/spam_filter_db_helper.java	2015-06-20 23:29:58.000000000 +0300
+@@ -0,0 +1,133 @@
++package com.fsck.k9.spam_filter;
++
++import android.content.Context;
++import android.database.Cursor;
++import android.database.sqlite.SQLiteDatabase;
++import android.database.sqlite.SQLiteOpenHelper;
++//import android.util.Log;
++
++//import com.fsck.k9.K9;
++
++/**
++ * Created by AvatarBlueray on 15.02.2015.
++ */
++public class spam_filter_db_helper  extends SQLiteOpenHelper {
++
++    // Logcat tag
++    private static final String LOG = "spam_filter_DatabaseHelper";
++
++    public static final String KEY_TITLE = "title";
++
++    public static final String KEY_FROM = "from1";
++    public static final String KEY_SUBJ = "subj";
++    public static final String KEY_HIDE = "_hide";
++    public static final String KEY_DEL = "_del";
++    public static final String KEY_ROWID = "_id";
++
++    public static final long  ACTION_ALLOW = 0;
++    public static final long  ACTION_HIDE = 1;
++    public static final long  ACTION_HIDENDEL = 2;
++
++    // Database Name
++    private static final String DATABASE_NAME = "data";
++
++    // Table Names
++    private static final String TABLE_NOTES = "notes";
++    private static final int DATABASE_VERSION = 4;
++
++    private static final String DATABASE_CREATE =
++            "create table notes ("+KEY_ROWID+" integer primary key autoincrement, "
++                    + KEY_TITLE + " text not null, "
++                    + KEY_FROM  + " text not null, "
++                    + KEY_SUBJ  + " text not null, "
++                    + KEY_HIDE  + " integer, "
++                    + KEY_DEL   + " integer    );";
++
++    public spam_filter_db_helper(Context context) {
++        super(context, DATABASE_NAME, null, DATABASE_VERSION);
++    }
++
++    @Override
++    public void onCreate(SQLiteDatabase db) {
++        // creating required tables
++        db.execSQL(DATABASE_CREATE);
++    }
++
++    @Override
++    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
++        // on upgrade drop older tables
++        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTES);
++
++        // create new tables
++        onCreate(db);
++    }
++
++    // closing database
++    public void closeDB() {
++        SQLiteDatabase db = this.getReadableDatabase();
++        if (db != null && db.isOpen())
++            db.close();
++    }
++
++    private long getReturnValue(long hide, long del, Cursor c){
++
++        c.close();
++
++        if (del!=0){
++            return   ACTION_HIDENDEL;
++        }else{
++            if (hide != 0){
++                return   ACTION_HIDE;
++            }else{
++                return  ACTION_ALLOW;
++            }
++        }
++
++    }
++    public long checkForSpamGetAction(String from, String subj) {
++
++        String selectQuery = "SELECT  * FROM " + TABLE_NOTES;
++
++       // Log.e(LOG, selectQuery);
++
++        SQLiteDatabase db = this.getReadableDatabase();
++
++        Cursor c = db.rawQuery(selectQuery, null);
++
++        // looping through all rows and adding to list
++        if (c.moveToFirst()) {
++            do {
++
++                String from_t = (c.getString((c.getColumnIndex(KEY_FROM))));
++                String subj_t = (c.getString((c.getColumnIndex(KEY_SUBJ))));
++
++              //  Log.e(K9.LOG_TAG, "check for spam " + from_t + "|"+from + " "+subj_t +"|"+subj );
++
++                long hide = (c.getLong((c.getColumnIndex(KEY_HIDE))));
++                long del = (c.getLong((c.getColumnIndex(KEY_DEL))));
++
++                if ( ! from_t.isEmpty()){
++                    if ( from.matches(from_t) ){
++                        if (! subj_t.isEmpty() ){
++                            if (subj.matches(subj_t)){
++                                return  getReturnValue(hide,del,c);
++                            }
++                        }else{
++                            return  getReturnValue(hide,del,c);
++                        }
++                    }
++                }else{
++                    if (! subj_t.isEmpty()){
++                        if (subj.matches(subj_t)){
++                            return  getReturnValue(hide,del,c);
++                        }
++                    }
++                }
++
++            } while (c.moveToNext());
++        }
++        c.close();
++        return ACTION_ALLOW;
++    }
++
++}
